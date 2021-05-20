@@ -33,28 +33,50 @@ Once RNA extraction is complete, libraries have been prepped and sequenced, and 
 - Make a new directory within /proj/marchlab/projects for your project, or new subdirectory within one of the existing project directories. Then download sequences if sequencing was done by an outside service (not UNC's High Throughput Sequencing facility HTSF)
 	- For example - when I got sequences for the High Yield 2020 EXPORTS project I made a directory within the existing Exports project folder called /HighYield2020. The sequencing was completed at Genewiz, who sent email detailing how to transfer files with sftp. This is an example of what this would looked like (JUST AN EXAMPLE, DO NOT RUN):
 ```
-#log into longleaf
+### log into longleaf
+
 ssh omtorano@longleaf.unc.edu
-#password prompt will come up automatically, you will not be able to see characters as you type them
+
+### password prompt will come up automatically, you will not be able to see characters as you type them
+
 Password: <enter password here>
-#cd changes directory
+
+### cd changes directory
+
 cd /proj/marchlab/projects/EXPORTS/metatranscriptomics/
-#mkdir makes a directory, here I am making the directory HighYield2020 and another directory within that called Reads on the following line
+
+### mkdir makes a directory, here I am making the directory HighYield2020 and another directory within that called Reads on the following line
+
 mkdir HighYield2020
 mkdir HighYield2020/Reads
-#the beginning of the directions from Genewiz - connect to their server via sftp
+
+### the beginning of the directions from Genewiz - connect to their server via sftp
+
 sftp a_marchetti_lab_gmail@sftp.genewiz.com
-#password prompt will come up automatically, enter the password they sent via email
+
+### password prompt will come up automatically, enter the password they sent via email
+
 password: <enter password genewiz sent here>
-#lcd sets the local directory (where you want your reads to go), does not change working directory (does not change where you are)
+
+### lcd sets the local directory (where you want your reads to go), does not change working directory (does not change where you are)
+
 lcd /proj/marchlab/projects/EXPORTS/metatranscriptomics/HighYield2020/Reads
-#ls lists items in the current working directory, in this case I just logged onto Genewiz so I am seeing the list of directories I have access to - likely there will be one and it will have the name of the Genewiz project number
+
+### ls lists items in the current working directory, in this case I just logged onto Genewiz so I am seeing the list of directories
+### I have access to - likely there will be one and it will have the name of the Genewiz project number
+
 ls
-#change directory into what ever directory was just listed by ls
+
+### change directory into what ever directory was just listed by ls
+
 cd <genewiz project folder name that just came up from ls command>
-#mget transfers files from working directory to whatever you set as your local directory. The '*' is a Linux wildcard that means 'get all the stuff'
+
+### mget transfers files from working directory to whatever you set as your local directory. The '*' is a Linux wildcard that means 'get all the stuff'
+
 mget * #I dont remember if there is a space here
-#end the sftp connection to transfer yourself back to longleaf
+
+### end the sftp connection to transfer yourself back to longleaf
+
 quit #Is this the command that ends sftp connection?
 ```
 ## Getting Started
