@@ -113,15 +113,17 @@ module load trim_galore
 module load pigz
 
 
-#### set in directory to where raw reads are, if you need to transfer reads from /proj run line 94, rsync -r (recursive, needed if transfering all files in directory) 
-#### /from/path /to/path
+#### set in directory to where raw reads are, if you need to transfer reads from /proj run line 94, rsync -r (recursive, needed
+### if transfering all files in directory) /from/path /to/path
+
 #rsync -r /proj/marchlab/projects/EXPORTS/metatranscriptomics/HighYield2020/Reads /pine/scr/o/m/omtorano
 
 indir=/pine/scr/o/m/omtorano/exports/reads
 outdir=/pine/scr/o/m/omtorano/exports/trimmed_reads
 
-### lines 105-111 create out directory if it does not already exist, echo is a linux command which basically means print - ie line 104 will print in your .out file "checking 
-### if out directory exists". 105-111 is a for loop and conditional saying if out directory does not exist make it, if it does exist print "... exists". 
+### lines 129-1135 create out directory if it does not already exist, echo is a linux command which basically means print - ie 
+### line 104 will print in your .out file "checking if out directory exists". 105-111 is a for loop and conditional saying if 
+### out directory does not exist make it, if it does exist print "... exists". 
 
 echo "Checking if ${outdir} exists ..."
 if [ ! -d ${outdir} ]
