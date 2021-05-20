@@ -90,11 +90,12 @@ module load trim_galore
 module load pigz
 
 
-#set in directory to where raw reads are
+#set in directory to where raw reads are, if you need to transfer reads from /proj run line 94, rsync -r (recursive, needed if transfering all files in directory) /from/path /to/path
+#rsync -r /proj/marchlab/projects/EXPORTS/metatranscriptomics/HighYield2020/Reads /pine/scr/o/m/omtorano
 indir=/pine/scr/o/m/omtorano/exports/reads
 outdir=/pine/scr/o/m/omtorano/exports/trimmed_reads
 
-#create ourdirectory
+#lines 100-106 creates out directory if it does not already exist, echo is a linux command which basically means print - ie line 99 will print in your .out file "checking if out directory exists". 100-106 is a for loop and conditional saying if out directory does not exist make it, if it does exist print "... exists". 
 echo "Checking if ${outdir} exists ..."
 if [ ! -d ${outdir} ]
 then
@@ -104,15 +105,16 @@ else
     echo " ... exists"
 fi
 
+#setting variable called 'RUN to = slurm array task id (info here https://slurm.schedmd.com/job_array.html) which is a very cool tool for submitting a bunch of jobs at once
 RUN=${SLURM_ARRAY_TASK_ID}
-#cuts path file at R1, prints everything before
+#ls ${indir}/*R1* will list all files in in directory that have R1 anywhere in the name, the * wildcard is used here to mean 'find R1 embedded in any string of characters before or after'. *R1 would only look for R1 occuring at the end of any string of characters, R1* would only look for R1 at the beginning. The '|' character 'pipes' commands, the output of ls is given to awk. awk here is being used to cut path file name at R1, -F is the field separator which is set here to R1, which results in names being split before and after the R1, '{print $1}' prints the first element of the split name. sed here is being used to isolate the 'changed' input names. The slurm array task id will basically run through a list of all of the files in the in directory, to input them one at a time sed -n followed by p prints only the file being processed by the slurm array. TBH I dont completely understand the nuance but it works. 
 input=`ls ${indir}/*R1* | awk -F 'R1' '{print $1}'| sed -n ${RUN}p`
 
-
+#The -e flag here allows echo to interprate the backslash escapes, here used to print on a new line "\n", other uses include "\t" if you want to echo something but have it be tab seperated
 echo -e "\nRun ID: ${RUN}"
 echo -e "\nSample: ${input}"
 
-
+# the actual trimming part, -j tells it how many cores to use, I think due to python versions it will actually only run one core as written here
 trim_galore -j 4 \
 	--paired ${input}R1* ${input}R2* \
 	-o  ${outdir}
