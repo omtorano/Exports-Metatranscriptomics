@@ -1,9 +1,73 @@
 # Marchetti-lab-metatranscriptomics
 Annotated metatranscriptomics pipeline
-codkfkjflkjdlkdj 
+adapted from https://github.com/Lswhiteh/diatom-metatranscriptomics
+# Overview
+This pipeline was used for the 2020 High Yield EXPORTS metatranscriptomics RNA samples, but every effort has been made to make these scripts easy to understand and modify for future projects. 
+
+The general steps this pipeline follows are:
+  - Trimming
+  - Quality control
+  - Assembly
+  - Annotation 
+  - Alignment
+  - ?
+
+# Getting started
+Once RNA extraction is complete, libraries have been prepped and sequenced, and sequences have been delivered the following steps are necessary to access and analyze seqs:
+ - 
+
+# Trimming
+For trimming I used the tool trim_galore https://github.com/FelixKrueger/TrimGalore/blob/master/Docs/Trim_Galore_User_Guide.md
+This tool removes low quality reads and auto detects and removes common adapters.
+
 ```
-code
-code code
+#!/bin/bash
+
+#SBATCH -p general
+#SBATCH --nodes=1
+#SBATCH --time=00-4:00:00
+#SBATCH --mem=10G
+#SBATCH --ntasks=5
+#SBATCH --array=1-21 #array #s needed?
+#SBATCH -J trim
+#SBATCH -o trim.%A_%a.out
+#SBATCH -e trim.%A_%a.err
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=omtorano@email.unc.edu
+
+#load necessary modules for trim_galore, auto loads python, cutadapt
+module load trim_galore
+module load pigz
+
+
+#set in directory to where raw reads are
+indir=/pine/scr/o/m/omtorano/exports/reads
+outdir=/pine/scr/o/m/omtorano/exports/trimmed_reads
+
+#create ourdirectory
+echo "Checking if ${outdir} exists ..."
+if [ ! -d ${outdir} ]
+then
+    echo "Create directory ... ${outdir}"
+    mkdir -p ${outdir}
+else
+    echo " ... exists"
+fi
+
+RUN=${SLURM_ARRAY_TASK_ID}
+#cuts path file at R1, prints everything before
+input=`ls ${indir}/*R1* | awk -F 'R1' '{print $1}'| sed -n ${RUN}p`
+
+
+echo -e "\nRun ID: ${RUN}"
+echo -e "\nSample: ${input}"
+
+
+trim_galore -j 4 \
+	--paired ${input}R1* ${input}R2* \
+	-o  ${outdir}
+	
+
 ```
 text  
 
