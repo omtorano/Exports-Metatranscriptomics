@@ -46,7 +46,7 @@ mkdir HighYield2020/Reads
 sftp a_marchetti_lab_gmail@sftp.genewiz.com
 #password prompt will come up automatically, enter the password they sent via email
 password: <enter password genewiz sent here>
-#lcd sets the local directory aka where you want your reads to go, does not change working directory (aka does not change where you are)
+#lcd sets the local directory (where you want your reads to go), does not change working directory (does not change where you are)
 lcd /proj/marchlab/projects/EXPORTS/metatranscriptomics/HighYield2020/Reads
 #ls lists items in the current working directory, in this case I just logged onto Genewiz so I am seeing the list of directories I have access to - likely there will be one and it will have the name of the Genewiz project number
 ls
@@ -57,7 +57,14 @@ mget * #I dont remember if there is a space here
 #end the sftp connection to transfer yourself back to longleaf
 quit #Is this the command that ends sftp connection?
 ```
-
+## Getting Started
+Rules for the Marchetti Lab /proj space
+- Do not work in the proj space, it is only for storage of 'final product' files from each stage in pipeline. We have a history of running out of space, storage availability can be tracked here https://rc-storage-info.its.unc.edu:32000/home.
+- Instead work in scratch (/pine/scr/<o>/<n>/<onyen>) or home directory (/nas/longleaf/home/<onyen>). Scratch has tons of space but inactive files will be deleted by ITS after ~30days, they send an email before deletion.
+- Use the rsync command to move files, mv deletes files from their original location and if interupted will result in data loss.
+- Use the rm (remove) command CAREFULLY, permanantly deletes files.
+- The recommended directory organization is to have directory for the project and seperate sub directories for code, reads, assemblies, annotations, and alignment (optional trimmed reads and fastqc output).
+- See final section of page for useful stuff.
 
 # Trimming
 For trimming I used the tool trim_galore https://github.com/FelixKrueger/TrimGalore/blob/master/Docs/Trim_Galore_User_Guide.md
