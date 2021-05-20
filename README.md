@@ -90,8 +90,9 @@ Rules for the Marchetti Lab /proj space
 
 # Trimming
 For trimming I used the tool trim_galore https://github.com/FelixKrueger/TrimGalore/blob/master/Docs/Trim_Galore_User_Guide.md
-This tool removes low quality reads and auto detects and removes common adapters.
+This tool removes low quality reads and auto detects and removes common adapters. Here I will explain the trimgalore.bash script, to download a version that can be run (with minor edits to file path names etc.) see files listed above or git clone. 
 
+Longleaf is a big computer with lots of nodes, when you log on to longleaf you, and everyone else, are on the login node. Anything you do on the login node takes up computing resources, if longleaf is being really slow it could be because there are tons of people using it. Due to the limited resources, anything more than really resource light commands (ie. moving files) should be done as a 'job'. A 'job' is basically what you call the commands you have saved in a file called a script once you ask it to be run. The way you ask for longleaf to run a job is by using the 'sbatch' command followed by the name of your script. Sbatch is a command that communicates with SLURM, the job scheduler that is used on longleaf. SLURM is just one of a few scheduling tools used by high performance computing platforms, but it is common enough that there are a lot of resources online. See https://its.unc.edu/research-computing/techdocs/getting-started-on-longleaf/#Job%20Submission
 ```
 #!/bin/bash
 
@@ -106,6 +107,7 @@ This tool removes low quality reads and auto detects and removes common adapters
 #SBATCH -e trim.%A_%a.err
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=omtorano@email.unc.edu
+```
 
 ### load necessary modules for trim_galore, auto loads python, cutadapt
 
