@@ -223,6 +223,7 @@ The goal of asembly in this work flow is to create a de novo assembly from all s
 Trinity is one option for assembly tools, the other I will go through here (next section) is Spades. Trinity is a multipurpose tool that can do a lot more than assembly, read more here https://github.com/trinityrnaseq/trinityrnaseq/wiki. During assembly it runs through different phases (see wiki) that can be split into different jobs depending on how big an assembly you are trying to make. For this project the stats of my assemblies are below:
 
 ![image](https://user-images.githubusercontent.com/48129653/119172362-d97edb00-ba33-11eb-87e6-f0a1a07acbec.png)
+
 Totals were calculated based on averages (total sequence length = average sequence length * number of samples), averages were calculated during multiqc step.
 
 	
