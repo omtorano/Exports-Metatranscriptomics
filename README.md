@@ -91,7 +91,7 @@ Rules for the Marchetti Lab /proj space
 
 # Trimming
 For trimming I used the tool trim_galore https://github.com/FelixKrueger/TrimGalore/blob/master/Docs/Trim_Galore_User_Guide.md
-This tool removes low quality reads and auto detects and removes common adapters. Here I will explain the trimgalore.bash script, to download a version that can be run (with minor edits to file path names etc.) see files listed above or git clone. 
+This tool removes low quality reads and auto detects and removes common adapters. Here I will explain the trimgalore.bash script, to download a version that can be run (with minor edits to file path names etc.) see files listed above or git clone. Copy and pasting individual sections of code will not work correctly, this must be run as a script.
 
 Longleaf is a big computer with lots of nodes, when you log on to longleaf you, and everyone else, are on the login node. Anything you do on the login node takes up computing resources, if longleaf is being really slow it could be because there are tons of people using it. Due to the limited resources, anything more than really resource light commands (ie. moving files) should be done as a 'job'. A 'job' is basically what you call the commands you have saved in a file called a script once you ask it to be run. The way you ask for longleaf to run a job is by using the 'sbatch' command followed by the name of your script. Sbatch is a command that communicates with SLURM, the job scheduler that is used on longleaf. SLURM is just one of a few scheduling tools used by high performance computing platforms, but it is common enough that there are a lot of resources online. SLURM basically manages the logistics of allocating compute time, memory, nodes etc. See https://its.unc.edu/research-computing/techdocs/getting-started-on-longleaf/#Job%20Submission. To tell SLURM how many resources you need the following paragraph goes at the beginning of a script:
 ```
@@ -148,16 +148,14 @@ Echo (print) the run id (here 1-21) and sample name purely for user ease of comp
 echo -e "\nRun ID: ${RUN}"
 echo -e "\nSample: ${input}"
 ```
-the actual trimming part, -j tells it how many cores to use, --paired tells it these are paired end reads, ${input} puts the unique sample id being cycled through by the slurm array, and we add back on the R1 and R2 endings, using the * wildcard lets us not have to type the entire file name. I think due to python versions it will actually only run one core as written here.
+Now the actual trimming part, -j tells it how many cores to use, --paired tells it these are paired end reads, ${input} puts the unique sample id being cycled through by the slurm array, and we add back on the R1 and R2 endings, using the * wildcard lets us not have to type the entire file name. I think due to python versions it will actually only run one core as written here.
 ```
 trim_galore -j 4 \
 	--paired ${input}R1* ${input}R2* \
 	-o  ${outdir}
-```	
-
 ```
-text  
-
-# dkfjlj  
-## header!!!  
-###### so much header  
+Above is the contents of the trim_galore.bash script explained. To run this script download it or git clone, edit the path files and email address, put the script into your working directory (i.e. your scratch space /pine/scr/o/n/onyen) and type the following:
+```
+sbatch trim_galore.bash
+```
+If working on one project in scratch it would not be necessary to make further subdirectories for reads as is written here (reads is a subdirectory of exports in this example).
