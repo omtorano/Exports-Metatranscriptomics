@@ -71,7 +71,8 @@ ls
 
 cd <genewiz project folder name that just came up from ls command>
 
-### mget transfers files from working directory to whatever you set as your local directory. The '*' is a Linux wildcard that means 'get all the stuff'
+### mget transfers files from working directory to whatever you set as your local directory. The '*' is a Linux wildcard that here 
+### means 'get all the stuff'
 
 mget * #I dont remember if there is a space here
 
@@ -115,18 +116,16 @@ load necessary modules for trim_galore, auto loads python & cutadapt
 module load trim_galore
 module load pigz
 ```
-Longleaf has many software tools available that can be used by adding them to your working space with 'modual load' (module add does the same thing). Other useful module management commands: module avail - lists allllll available modules, module list - shows all the modules you have loaded in your working space (loading a module in a job does not mean it will be loaded in your login session), module rm <module name> - removes specific module, module purge - removes all modules loded in your space. Most longleaf modules are stored in logleaf here: /nas/longleaf/apps/
+Longleaf has many software tools available that can be used by adding them to your working space with 'modual load' (module add does the same thing). Other useful module management commands: module avail - lists allllll available modules (modify by doing module avail r* etc. to search for modules starting with r etc.), module list - shows all the modules you have loaded in your working space (loading a module in a job does not mean it will be loaded in your login session), module rm <module name> - removes specific module, module purge - removes all modules loded in your space. Most longleaf modules are stored in logleaf here: /nas/longleaf/apps/
 
-set 'in' directory to where raw reads are, if you need to transfer reads from /proj run line 94, rsync -r (recursive, needed if transfering all files in directory) /from/path /to/path
+set 'in' directory to where raw reads are, if you need to transfer reads from /proj run rsync -r (recursive, needed if transfering all files in directory) /from/path /to/path
 ```
 rsync -r /proj/marchlab/projects/EXPORTS/metatranscriptomics/HighYield2020/Reads /pine/scr/o/m/omtorano
 indir=/pine/scr/o/m/omtorano/exports/reads
 outdir=/pine/scr/o/m/omtorano/exports/trimmed_reads
 ```
-### lines 129-1135 create out directory if it does not already exist, echo is a linux command which basically means print - ie 
-### line 104 will print in your .out file "checking if out directory exists". 105-111 is a for loop and conditional saying if 
-### out directory does not exist make it, if it does exist print "... exists". 
-
+This creates the out directory if it does not already exist. Echo is a linux command which basically means print - ie this line will print in your .out file "checking if out directory exists", this is not necessary for creating the directory, just helpful to tell you what its doing. Below this is a for loop and conditional saying if out directory does not exist make it, if it does exist print "... exists". The"!" basically means 'not this', in this case if outdir does not exist. 
+```
 echo "Checking if ${outdir} exists ..."
 if [ ! -d ${outdir} ]
 then
@@ -135,32 +134,26 @@ then
 else
     echo " ... exists"
 fi
-
-### setting variable called 'RUN to = slurm array task id (info here https://slurm.schedmd.com/job_array.html) which is a very cool tool for submitting a bunch of jobs at once
-
+```
+Set variable called 'RUN to = slurm array task id (https://slurm.schedmd.com/job_array.html) which is a very cool tool for submitting a bunch of jobs at once, more explination below. This isnt really necessary but makes the following line a bit cleaner.
+```
 RUN=${SLURM_ARRAY_TASK_ID}
-
-### ls ${indir}/*R1* will list all files in in directory that have R1 anywhere in the name, the * wildcard is used here to mean 'find R1 embedded in any string of characters 
-### before or after'. *R1 would only look for R1 occuring at the end of any string of characters, R1* would only look for R1 at the beginning. The '|' character 'pipes' 
-### commands, the output of ls is given to awk. awk here is being used to cut path file name at R1, -F is the field separator which is set here to R1, which results in names
-### being split before and after the R1, '{print $1}' prints the first element of the split name. sed here is being used to isolate the 'changed' input names. The slurm array 
-### task id will basically run through a list of all of the files in the in directory, to input them one at a time sed -n followed by p prints only the file being processed by 
-### the slurm array. TBH I dont completely understand the nuance but it works. 
-
+```
+The line below parses and defines input as the sample name that will be input to trim_galore. ls ${indir}/*R1* will list all files in in directory that have R1 anywhere in the name, the * wildcard is used here to mean find R1 embedded in any string of characters before or after. *R1 would only look for R1 occuring at the end of any string of characters, R1* would only look for R1 at the beginning. This is done to get each sample name listed one time (there will be an R1 and R2 in the indir assuming paired end reads). The '|' character 'pipes' commands, the output of ls is given to awk. awk here is being used to cut path file name at R1, -F is the field separator which is set here to R1. This results in names being split before and after the R1, '{print $1}' prints the first element of the split name, now we have each unique sample ID listed one time. sed here is being used to isolate the 'changed' input names. The slurm array task id will basically run through a list of all of the unique sample names, to input them one at a time sed -n followed by p prints only the file being processed by the slurm array. sed and awk are useful Linux tools however there are multiple ways to accomplish this string parsing to get the uniique sample names.
+```
 input=`ls ${indir}/*R1* | awk -F 'R1' '{print $1}'| sed -n ${RUN}p`
-
-### The -e flag here allows echo to interprate the backslash escapes, here used to print on a new line "\n", other uses include "\t" if you want to echo something but have it
-### be tab seperated
-
+```
+Echo (print) the run id (here 1-21) and sample name purely for user ease of comprehension, this has no affect on trimming. The -e flag here allows echo to interprate the backslash escapes, here used to print on a new line "\n", other uses include "\t" if you want to echo something but have it be tab seperated.
+```
 echo -e "\nRun ID: ${RUN}"
 echo -e "\nSample: ${input}"
-
-### the actual trimming part, -j tells it how many cores to use, I think due to python versions it will actually only run one core as written here
-
+```
+the actual trimming part, -j tells it how many cores to use, --paired tells it these are paired end reads, ${input} puts the unique sample id being cycled through by the slurm array, and we add back on the R1 and R2 endings, using the * wildcard lets us not have to type the entire file name. I think due to python versions it will actually only run one core as written here.
+```
 trim_galore -j 4 \
 	--paired ${input}R1* ${input}R2* \
 	-o  ${outdir}
-	
+```	
 
 ```
 text  
