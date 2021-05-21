@@ -93,7 +93,7 @@ Rules for the Marchetti Lab /proj space
 For trimming I used the tool trim_galore https://github.com/FelixKrueger/TrimGalore/blob/master/Docs/Trim_Galore_User_Guide.md
 This tool removes low quality reads and auto detects and removes common adapters. Here I will explain the trimgalore.bash script, to download a version that can be run (with minor edits to file path names etc.) see files listed above or git clone. Copy and pasting individual sections of code will not work correctly, this must be run as a script.
 
-Longleaf is a big computer with lots of nodes, when you log on to longleaf you, and everyone else, are on the login node. Anything you do on the login node takes up computing resources, if longleaf is being really slow it could be because there are tons of people using it. Due to the limited resources, anything more than really resource light commands (ie. moving files) should be done as a 'job'. A 'job' is basically what you call the commands you have saved in a file called a script once you ask it to be run. The way you ask for longleaf to run a job is by using the 'sbatch' command followed by the name of your script. Sbatch is a command that communicates with SLURM, the job scheduler that is used on longleaf. SLURM is just one of a few scheduling tools used by high performance computing platforms, but it is common enough that there are a lot of resources online. SLURM basically manages the logistics of allocating compute time, memory, nodes etc. See https://its.unc.edu/research-computing/techdocs/getting-started-on-longleaf/#Job%20Submission. To tell SLURM how many resources you need the following paragraph goes at the beginning of a script:
+1) Longleaf is a big computer with lots of nodes, when you log on to longleaf you, and everyone else, are on the login node. Anything you do on the login node takes up computing resources, if longleaf is being really slow it could be because there are tons of people using it. Due to the limited resources, anything more than really resource light commands (ie. moving files) should be done as a 'job'. A 'job' is basically what you call the commands you have saved in a file called a script once you ask it to be run. The way you ask for longleaf to run a job is by using the 'sbatch' command followed by the name of your script. Sbatch is a command that communicates with SLURM, the job scheduler that is used on longleaf. SLURM is just one of a few scheduling tools used by high performance computing platforms, but it is common enough that there are a lot of resources online. SLURM basically manages the logistics of allocating compute time, memory, nodes etc. See https://its.unc.edu/research-computing/techdocs/getting-started-on-longleaf/#Job%20Submission. To tell SLURM how many resources you need the following paragraph goes at the beginning of a script:
 ```
 #!/bin/bash
 
@@ -111,20 +111,20 @@ Longleaf is a big computer with lots of nodes, when you log on to longleaf you, 
 ```
 While '#' normally indicates lines within code that are not read, that isnt the case here. The first line is called a shebang and for this script tells longleaf this is a bash script, other scripts (python, etc.) might look different. Below this are the SLURM options, here it's requesting a general node (instead of bigmem, snp, etc.), 1 node, 4 hours of time, 10 gigs of memory, 5 tasks, indicating that we are requesting an array and giving the length of the array (here I have 21 samples), assigning the job name to be trim, assigning the name of the '.out' file to be trim.jobnumber_arraynumber.out, same for the error file but .err, requesting longleaf send an email when the job starts, ends, or fails, and give the email address to send the notification to. Most (all?) functions when run create a 'output stream' and 'error stream', basically any text output from a function working properly will be part of the 'output stream', and errors will be part of the 'error stream'. Instead of printing to the terminal screen these streams are passed into files that will appear in your working directory. This job creates 21 .out and 21 .err files, hence it is important to add the unique job number to the name. 
 
-load necessary modules for trim_galore, auto loads python & cutadapt
+2) load necessary modules for trim_galore, auto loads python & cutadapt
 ```
 module load trim_galore
 module load pigz
 ```
 Longleaf has many software tools available that can be used by adding them to your working space with 'modual load' (module add does the same thing). Other useful module management commands: module avail - lists allllll available modules (modify by doing module avail r* etc. to search for modules starting with r etc.), module list - shows all the modules you have loaded in your working space (loading a module in a job does not mean it will be loaded in your login session), module rm <module name> - removes specific module, module purge - removes all modules loded in your space. Most longleaf modules are stored in logleaf here: /nas/longleaf/apps/
 
-set 'in' directory to where raw reads are, if you need to transfer reads from /proj run rsync -r (recursive, needed if transfering all files in directory) /from/path /to/path
+3) set 'in' directory to where raw reads are, if you need to transfer reads from /proj run rsync -r (recursive, needed if transfering all files in directory) /from/path /to/path
 ```
 rsync -r /proj/marchlab/projects/EXPORTS/metatranscriptomics/HighYield2020/Reads /pine/scr/o/m/omtorano
 indir=/pine/scr/o/m/omtorano/exports/reads
 outdir=/pine/scr/o/m/omtorano/exports/trimmed_reads
 ```
-This creates the out directory if it does not already exist. Echo is a linux command which basically means print - ie this line will print in your .out file "checking if out directory exists", this is not necessary for creating the directory, just helpful to tell you what its doing. Below this is a for loop and conditional saying if out directory does not exist make it, if it does exist print "... exists". The"!" basically means 'not this', in this case if outdir does not exist. 
+4) This creates the out directory if it does not already exist. Echo is a linux command which basically means print - ie this line will print in your .out file "checking if out directory exists", this is not necessary for creating the directory, just helpful to tell you what its doing. Below this is a for loop and conditional saying if out directory does not exist make it, if it does exist print "... exists". The"!" basically means 'not this', in this case if outdir does not exist. 
 ```
 echo "Checking if ${outdir} exists ..."
 if [ ! -d ${outdir} ]
@@ -135,27 +135,85 @@ else
     echo " ... exists"
 fi
 ```
-Set variable called 'RUN to = slurm array task id (https://slurm.schedmd.com/job_array.html) which is a very cool tool for submitting a bunch of jobs at once, more explination below. This isnt really necessary but makes the following line a bit cleaner.
+5) Set variable called 'RUN to = slurm array task id (https://slurm.schedmd.com/job_array.html) which is a very cool tool for submitting a bunch of jobs at once, more explination below. This isnt really necessary but makes the following line a bit cleaner.
 ```
 RUN=${SLURM_ARRAY_TASK_ID}
 ```
-The line below parses and defines input as the sample name that will be input to trim_galore. ls ${indir}/*R1* will list all files in in directory that have R1 anywhere in the name, the * wildcard is used here to mean find R1 embedded in any string of characters before or after. *R1 would only look for R1 occuring at the end of any string of characters, R1* would only look for R1 at the beginning. This is done to get each sample name listed one time (there will be an R1 and R2 in the indir assuming paired end reads). The '|' character 'pipes' commands, the output of ls is given to awk. awk here is being used to cut path file name at R1, -F is the field separator which is set here to R1. This results in names being split before and after the R1, '{print $1}' prints the first element of the split name, now we have each unique sample ID listed one time. sed here is being used to isolate the 'changed' input names. The slurm array task id will basically run through a list of all of the unique sample names, to input them one at a time sed -n followed by p prints only the file being processed by the slurm array. sed and awk are useful Linux tools however there are multiple ways to accomplish this string parsing to get the uniique sample names.
+6) Parse and defines input as the sample name that will be input to trim_galore. ls ${indir}/*R1* will list all files in in directory that have R1 anywhere in the name, the * wildcard is used here to mean find R1 embedded in any string of characters before or after. *R1 would only look for R1 occuring at the end of any string of characters, R1* would only look for R1 at the beginning. This is done to get each sample name listed one time (there will be an R1 and R2 in the indir assuming paired end reads). The '|' character 'pipes' commands, the output of ls is given to awk. awk here is being used to cut path file name at R1, -F is the field separator which is set here to R1. This results in names being split before and after the R1, '{print $1}' prints the first element of the split name, now we have each unique sample ID listed one time. sed here is being used to isolate the 'changed' input names. The slurm array task id will basically run through a list of all of the unique sample names, to input them one at a time sed -n followed by p prints only the file being processed by the slurm array. sed and awk are useful Linux tools however there are multiple ways to accomplish this string parsing to get the uniique sample names.
 ```
 input=`ls ${indir}/*R1* | awk -F 'R1' '{print $1}'| sed -n ${RUN}p`
 ```
-Echo (print) the run id (here 1-21) and sample name purely for user ease of comprehension, this has no affect on trimming. The -e flag here allows echo to interprate the backslash escapes, here used to print on a new line "\n", other uses include "\t" if you want to echo something but have it be tab seperated.
+7) Echo (print) the run id (here 1-21) and sample name purely for user ease of comprehension, this has no affect on trimming. The -e flag here allows echo to interprate the backslash escapes, here used to print on a new line "\n", other uses include "\t" if you want to echo something but have it be tab seperated.
 ```
 echo -e "\nRun ID: ${RUN}"
 echo -e "\nSample: ${input}"
 ```
-Now the actual trimming part, -j tells it how many cores to use, --paired tells it these are paired end reads, ${input} puts the unique sample id being cycled through by the slurm array, and we add back on the R1 and R2 endings, using the * wildcard lets us not have to type the entire file name. I think due to python versions it will actually only run one core as written here.
+8) Now the actual trimming part, -j tells it how many cores to use, --paired tells it these are paired end reads, ${input} puts the unique sample id being cycled through by the slurm array, and we add back on the R1 and R2 endings, using the * wildcard lets us not have to type the entire file name. I think due to python versions it will actually only run one core as written here.
 ```
 trim_galore -j 4 \
 	--paired ${input}R1* ${input}R2* \
 	-o  ${outdir}
 ```
-Above is the contents of the trim_galore.bash script explained. To run this script download it or git clone, edit the path files and email address, put the script into your working directory (i.e. your scratch space /pine/scr/o/n/onyen) and type the following:
+
+9) To run this script download it or git clone, edit the path files and email address, put the script into your working directory (i.e. your scratch space /pine/scr/o/n/onyen) and type the following:
 ```
 sbatch trim_galore.bash
 ```
 If working on one project in scratch it would not be necessary to make further subdirectories for reads as is written here (reads is a subdirectory of exports in this example).
+
+# Fastqc
+In this and following steps I will only go through new code elements that differ from trim_galore.
+No array is used here, set tasks to # of samples. Due to the lack of array elements the a% part of .out and .err file names is unnecessary.
+```
+#!/bin/bash
+
+#SBATCH -p general
+#SBATCH --nodes=1
+#SBATCH --time=02-0:00:00
+#SBATCH --mem=60G
+#SBATCH --ntasks=42
+#SBATCH -J qc
+#SBATCH -o qc.%A.out
+#SBATCH -e qc.%A.err
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=omtorano@email.unc.edu
+
+module load fastqc
+
+raw_reads=/pine/scr/o/m/omtorano/exports/reads        
+trim_reads=/pine/scr/o/m/omtorano/exports/trimmed_reads
+```
+set out directory to where fastqc output should go, can make 2 directories to keep raw and trimmed output seperate
+```
+outdir=/pine/scr/o/m/omtorano/exports/fastqc_output
+
+#create ourdirectory
+echo "Checking if ${outdir} exists ..."
+if [ ! -d ${outdir} ]
+then
+    echo "Create directory ... ${outdir}"
+    mkdir -p ${outdir}
+else
+    echo " ... exists"
+fi
+
+```
+run fastqc on untrimmed raw reads, reads will run simultaneously, set threads to # of reads
+```
+fastqc -t 42 $raw_reads/* -o ${outdir}
+#append output file names, did this to make multiqc report easier to read but multiqc does not keep file names
+cd ${outdir}
+for f in *; do mv "$f" "raw_$f"; done
+#run fastqc on trimmed raw reads, using *.gz searches for anything that ends with .gz, excludes trimming reports
+fastqc -t 42 $trim_reads/*.gz -o ${outdir}
+#append output file names excluding those that were appended previously (append all new files)
+#This works in terminal not in script
+#for f in !(raw*); do mv "$f" "trimmed_$f"; done
+```
+create multiqc file for all fastqc output, '.' means 'current directory'.
+```
+module load multiqc
+multiqc . 
+```
+
+
