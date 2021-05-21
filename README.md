@@ -89,7 +89,7 @@ Rules for the Marchetti Lab /proj space
 - The recommended directory organization is to have directory for the project and seperate sub directories for code, reads, assemblies, annotations, and alignment (optional trimmed reads and fastqc output).
 - See final section of page for useful stuff.
 
-# Trimming
+# Trimming with trim_galore
 For trimming I used the tool trim_galore https://github.com/FelixKrueger/TrimGalore/blob/master/Docs/Trim_Galore_User_Guide.md
 This tool removes low quality reads and auto detects and removes common adapters. Here I will explain the trimgalore.bash script, to download a version that can be run (with minor edits to file path names etc.) see files listed above or git clone. Copy and pasting individual sections of code will not work correctly, this must be run as a script.
 
@@ -161,7 +161,7 @@ sbatch trim_galore.bash
 ```
 If working on one project in scratch it would not be necessary to make further subdirectories for reads as is written here (reads is a subdirectory of exports in this example).
 
-# Fastqc
+# Quality contril with Fastqc
 In this and following steps I will only go through new code elements that differ from trim_galore.
 No array is used here, set tasks to # of samples. Due to the lack of array elements the a% part of .out and .err file names is unnecessary.
 ```
@@ -215,5 +215,12 @@ create multiqc file for all fastqc output, '.' means 'current directory'.
 module load multiqc
 multiqc . 
 ```
+# Assembly with Trinity
+The goal of asembly in this work flow is to create a de novo assembly from all samples in a 'group' which you can map back to in the alignment step. For the Exports High Yield 2020 samples were collected on different days from two different depths, 1 & 4. I am interested in comparing between days, not depths, I am therefore creating an assembly of all depth 1 samples and all depth 4 samples. This way I can compare samples collected at a single depth, instead of between both depths. 
+
+Trinity is one option for assembly tools, the other I will go through here (next section) is Spades. Trinity is a multipurpose tool that can do a lot more than assembly, read more here https://github.com/trinityrnaseq/trinityrnaseq/wiki. During assembly it runs through different phases (see wiki) that can be split into different jobs depending on how big an assembly you are trying to make. For this project the stats of my assemblies are below:
+![image](https://user-images.githubusercontent.com/48129653/119172064-6f663600-ba33-11eb-9fdd-bab47a232168.png)
+
+	
 
 
