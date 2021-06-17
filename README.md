@@ -84,7 +84,7 @@ quit #Is this the command that ends sftp connection?
 ## Getting Started
 Rules for the Marchetti Lab /proj space
 - Do not work in the proj space, it is only for storage of 'final product' files from each stage in pipeline. We have a history of running out of space, storage availability can be tracked here https://rc-storage-info.its.unc.edu:32000.
-- Instead work in scratch (/pine/scr/<o>/<n>/<onyen>) or home directory (/nas/longleaf/home/<onyen>). Scratch has tons of space but inactive files will be deleted by ITS after ~30days, they send an email before deletion.
+- Instead work in scratch (/pine/scr/o/n/onyen, for example my path is /pine/scr/o/m/omtorano) or home directory (/nas/longleaf/home/onyen). Scratch has tons of space but inactive files will be deleted by ITS after ~30days, they send an email before deletion.
 - Use the rsync command to move files, mv deletes files from their original location and if interrupted will result in data loss.
 - Use the rm (remove) command CAREFULLY, permanently deletes files.
 - The recommended directory organization is to have directory for the project and separate sub directories for code, reads, assemblies, annotations, and alignment (optional trimmed reads and fastqc output).
