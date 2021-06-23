@@ -225,7 +225,38 @@ Trinity is one option for assembly tools, the other I will go through here (next
 
 Totals were calculated based on averages (total sequence length = average sequence length * number of samples), averages were calculated during multiqc step.
 
+Assembly is where things start to get complicated, depending on how many sequences you have and the questions you are trying to answer there are many different tools and ways to do it within those tools - there are lots of studies comparing different tools. I tried MANY different methods for assembly with varying success. The script described here will assemble each individual sample. They will then be combined into a depth 1 & 4 assembly in the next step (cdhit). 
+Some other things I tried: 
+	- assembling samples by triplicate and assembling those in cdhit - this resulted in relativly low mapping rates and took a lot of time and memory. In fact, assembling triplicates required Trinity to be broken up into multiple scripts due to maxed out memory.
+	- assembling by depth (all depth 1 samples in one script and all depth 4 in another), never finished withing alloted time and memory even when broken down by phase. 
+	- using IDBA (never finished).
+	- Spades individual assemblies (see next section)
+	- Spades depth assemblies (see next section)
+	
+As of 6/23/3031 the newest version of Trinity available on longleaf is trinity/2.8.6 and the newest version of trinity available is trinity/2.12.0. There have been some requests for ITS to update trinity but it has not happened. Options for running trinity include:
+	- using the available version on longleaf, easiest and what is described below 
+	- using a docker or singularity image (https://github.com/trinityrnaseq/trinityrnaseq/wiki/Trinity-in-Docker#trinity_singularity), this should be easy but trinity does not currently support the use of the gridrunner tool (see below) on singularity
+	- downloading and compiling the newest version of trinity onto longleaf. I did not spend a lot of time on this but it is not that easy and I did not get it to work. When trinity is added using 'module load' additional packages are automatically added and the user environment (view by typing 'env' into command line) is automatically modified so all the libraries etc. have the right paths. This would need to be altered manually if trinity is run from a manually compiled version.
+	
+Module loading trinity will automatically load bowtie/1.2.3, bowtie2/2.4.1, jellyfish/2.2.10, trinity/2.8.6, perl/5.18.2, samtools/1.12, and salmon/0.9.1. Longleaf auto loading other necessary packages is a common thing and good to know about for a few reasons. 1) It does not always auto load the correct versions of these software tools. When I first started using trinity an old version of samtools was autoloaded, I emailed ITS about this and they fixed it so the correct version loaded. 2) If you are using multiple tools there may be conflicting versions of auto loaded software, this is common with python and perl. 
+```
+#!/bin/bash
+#SBATCH -N 1
+#SBATCH -t 6-00:00:00
+#SBATCH -J trinity
+#SBATCH -o trinity.%j_%a.out
+#SBATCH -e trinity.%j_%a.err
+#SBATCH --array=1-21%2
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=omtorano@unc.edu
+#SBATCH --mem=500G
+#SBATCH --cpus-per-task=18
+#SBATCH --ntasks=1
 
+
+module load trinity	
+```
+	
 	
 
 
