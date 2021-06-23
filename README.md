@@ -199,24 +199,21 @@ else
 fi
 
 ```
-run fastqc on untrimmed raw reads, reads will run simultaneously, set threads to # of reads
+run fastqc on untrimmed raw reads and trimmed reads, reads will run simultaneously, set threads to # of reads
 ```
 fastqc -t 42 $raw_reads/* -o ${outdir}
-#append output file names, did this to make multiqc report easier to read but multiqc does not keep file names
-cd ${outdir}
-for f in *; do mv "$f" "raw_$f"; done
-#run fastqc on trimmed raw reads, using *.gz searches for anything that ends with .gz, excludes trimming reports
+#run fastqc on trimmed reads, using *.gz searches for anything that ends with .gz, excludes trimming reports
 fastqc -t 42 $trim_reads/*.gz -o ${outdir}
-#append output file names excluding those that were appended previously (append all new files)
-#This works in terminal not in script
-#for f in !(raw*); do mv "$f" "trimmed_$f"; done
 ```
 create multiqc file for all fastqc output, '.' means 'current directory'.
 ```
+cd ${outdir}
 module load multiqc
 multiqc . 
 ```
-The multiqc step will result in an .html file that can be dragged and dropped into a browser. This file contains the compiled fastq reports from all trimmed and raw reads. If there are certain samples that have low quality or vary from the rest of the samples this may indicate that these sample need to be removed from further analysis. 
+The multiqc step will result in an .html file that can be dragged and dropped into a browser. This file contains the compiled fastq reports from all trimmed and raw reads. If there are certain samples that have low quality or vary from the rest of the samples this may indicate that these sample need to be removed from further analysis. Full multiqc output for the High Yield 2020 samples is saved in HighYield2020_multiqc_report.html, below is an example of what it looks like.. 
+	![tempsnip](https://user-images.githubusercontent.com/48129653/123166467-71ad1d00-d443-11eb-9bf7-d6b0f8355739.png)
+
 
 # Assembly with Trinity
 The goal of assembly in this work flow is to create a de novo assembly from all samples in a 'group' which you can map back to in the alignment step. For the Exports High Yield 2020 samples were collected on different days from two different depths, 1 & 4. I am interested in comparing between days, not depths, I am therefore creating an assembly of all depth 1 samples and all depth 4 samples. This way I can compare samples collected at a single depth, instead of between both depths. 
