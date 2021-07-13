@@ -267,9 +267,9 @@ After assembling individual samples use CD hit to create "grand" assemblies, for
 Annotate with database of choice, in this project used KEGG for functional annotation and phylodb for taxinomic annotation. 
 Make database of choice unto diamond database, use diamond to blast genes against database.
 For this project then used keggannot and fastannotation.py to format annotation files.
-#Align
+# Align
 Align individual samples with "grand" assemblies. Used salmon for this project, create "grand" assembly indix, align with salmon quant.
-#Differential expression
+# Differential expression
 Use tximport to get all quant.sf files into correct format. 
 dont export files to csv, can export as R documents. 
 
