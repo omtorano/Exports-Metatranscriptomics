@@ -256,7 +256,22 @@ Module loading trinity will automatically load bowtie/1.2.3, bowtie2/2.4.1, jell
 
 module load trinity	
 ```
+
+currently running in array without gridrunner
 	
-	
+# CD hit
+https://github.com/weizhongli/cdhit/wiki/3.-User's-Guide
+After assembling individual samples use CD hit to create "grand" assemblies, for Exports high yield created depth 1 and depth 4 assemblies
+
+# Annotate
+Annotate with database of choice, in this project used KEGG for functional annotation and phylodb for taxinomic annotation. 
+Make database of choice unto diamond database, use diamond to blast genes against database.
+For this project then used keggannot and fastannotation.py to format annotation files.
+#Align
+Align individual samples with "grand" assemblies. Used salmon for this project, create "grand" assembly indix, align with salmon quant.
+#Differential expression
+Use tximport to get all quant.sf files into correct format. 
+dont export files to csv, can export as R documents. 
+
 
 
