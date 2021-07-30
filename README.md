@@ -10,7 +10,7 @@ The general steps this pipeline follows are:
   - Assembly
   - Annotation 
   - Alignment
-  - ?
+  - Differential expression
 
 ## Before Getting started
 Once RNA extraction is complete, libraries have been prepped and sequenced, and sequences have been delivered the following steps are necessary to access and analyze seqs
