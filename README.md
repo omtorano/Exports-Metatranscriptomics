@@ -91,10 +91,17 @@ Rules for the Marchetti Lab /proj space
 - See final section of page for useful stuff.
 
 # Trimming with trim_galore
+
+Tl;dr
+```
+sbatch trim_galore.bash
+```
+The details...
+
 For trimming I used the tool trim_galore https://github.com/FelixKrueger/TrimGalore/blob/master/Docs/Trim_Galore_User_Guide.md
 This tool removes low quality reads and auto detects and removes common adapters. Here I will explain the trimgalore.bash script, to download a version that can be run (with minor edits to file path names etc.) see files listed above or git clone. Copy and pasting individual sections of code will not work correctly, this must be run as a script.
 
-1) Longleaf is a big computer with lots of nodes, when you log on to longleaf you, and everyone else, are on the login node. Anything you do on the login node takes up computing resources, if longleaf is being really slow it could be because there are tons of people using it. Due to the limited resources, anything more than really resource light commands (i.e. moving files) should be done as a 'job'. A 'job' is basically what you call the commands you have saved in a file called a script once you ask it to be run. The way you ask for longleaf to run a job is by using the 'sbatch' command followed by the name of your script. Sbatch is a command that communicates with SLURM, the job scheduler that is used on longleaf. SLURM is just one of a few scheduling tools used by high performance computing platforms, but it is common enough that there are a lot of resources online. SLURM basically manages the logistics of allocating compute time, memory, nodes etc. See https://its.unc.edu/research-computing/techdocs/getting-started-on-longleaf/#Job%20Submission. To tell SLURM how many resources you need the following paragraph goes at the beginning of a script:
+1) Longleaf is a big computer with lots of nodes, when you log on to longleaf you, and everyone else, are on the login node. Anything you do on the login node takes up computing resources, if longleaf is being really slow it could be because there are tons of people using it. Due to the limited resources, anything more than really resource light commands (i.e. moving files) should be done as a 'job'. A 'job' is basically what you call the commands you have saved in a file called a script once you ask it to be run. The way you ask for longleaf to run a job is by using the 'sbatch' command followed by the name of your script. Sbatch is a command that communicates with SLURM, the job scheduler that is used on longleaf. SLURM is just one of a few scheduling tools used by high performance computing platforms, but it is common enough that there are a lot of resources online. SLURM basically manages the logistics of allocating compute time, memory, nodes etc. See https://its.unc.edu/research-computing/techdocs/getting-started-on-longleaf/#Job%20Submission. To tell SLURM the resources you need the following paragraph goes at the beginning of a script:
 ```
 #!/bin/bash
 
@@ -110,14 +117,14 @@ This tool removes low quality reads and auto detects and removes common adapters
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=omtorano@email.unc.edu
 ```
-While '#' normally indicates lines within code that are not read, that isn’t the case here. The first line is called a shebang and for this script tells longleaf this is a bash script, other scripts (python, etc.) might look different. Below this are the SLURM options, here it's requesting a general node (instead of bigmem, snp, etc.), 1 node, 4 hours of time, 10 gigs of memory, 5 tasks, indicating that we are requesting an array and giving the length of the array (here I have 21 samples), assigning the job name to be trim, assigning the name of the '.out' file to be trim.jobnumber_arraynumber.out, same for the error file but .err, requesting longleaf send an email when the job starts, ends, or fails, and give the email address to send the notification to. Most (all?) functions when run create a 'output stream' and 'error stream', basically any text output from a function working properly will be part of the 'output stream', and errors will be part of the 'error stream'. Instead of printing to the terminal screen these streams are passed into files that will appear in your working directory. This job creates 21 .out and 21 .err files, hence it is important to add the unique job number to the name. 
+While '#' normally indicates lines within code that are not read, that isn’t the case here. The first line is called a shebang and for this script tells longleaf this is a bash script, other scripts (python, etc.) might look different. Below this are the SLURM options, here it's requesting a general node (instead of bigmem, snp, etc.), 1 node, 4 hours of time, 10 gigs of memory, 5 tasks, indicating that we are requesting an array and giving the length of the array (here I have 21 samples), assigning the job name to be trim, assigning the name of the '.out' file to be trim.jobnumber_arraynumber.out, same for the error file but .err, requesting longleaf send an email when the job starts, ends, or fails, and gives the email address to send the notification to. Most (all?) functions when run create a 'output stream' and 'error stream', basically any text output from a function working properly will be part of the 'output stream', and errors will be part of the 'error stream'. Instead of printing to the terminal, these streams are passed into files that will appear in your working directory. This job creates 21 .out and 21 .err files, hence it is important to add the unique job number to the name. 
 
 2) load necessary modules for trim_galore, auto loads python & cutadapt
 ```
 module load trim_galore
 module load pigz
 ```
-Longleaf has many software tools available that can be used by adding them to your working space with 'module load' (module add does the same thing). Other useful module management commands: module avail - lists allllll available modules (modify by doing module avail r* etc. to search for modules starting with r etc.), module list - shows all the modules you have loaded in your working space (loading a module in a job does not mean it will be loaded in your login session), module rm <module name> - removes specific module, module purge - removes all modules loaded in your space. Most longleaf modules are stored in longleaf here: /nas/longleaf/apps/
+Longleaf has many software tools available that can be used by adding them to your working space with 'module load' ('module add' does the same thing). Other useful module management commands: module avail - lists allllll available modules (modify by doing 'module avail r*' etc. to search for modules starting with r etc.), 'module list' - shows all the modules you have loaded in your working space (loading a module in a job does not mean it will be loaded in your login session), 'module rm <module name>' - removes specific module, 'module purge' - removes all modules loaded in your space. Most longleaf modules are stored in longleaf here: /nas/longleaf/apps/
 
 3) set 'in' directory to where raw reads are, if you need to transfer reads from /proj run rsync -r (recursive, needed if transferring all files in directory) /from/path /to/path
 ```
@@ -125,7 +132,8 @@ rsync -r /proj/marchlab/projects/EXPORTS/metatranscriptomics/HighYield2020/Reads
 indir=/pine/scr/o/m/omtorano/exports/reads
 outdir=/pine/scr/o/m/omtorano/exports/trimmed_reads
 ```
-4) This creates the out directory if it does not already exist. Echo is a Linux command which basically means print - i.e. this line will print in your .out file "checking if out directory exists", this is not necessary for creating the directory, just helpful to tell you what it’s doing. Below this is a for loop and conditional saying if out directory does not exist make it, if it does exist print "... exists". The"!" basically means 'not this', in this case if outdir does not exist. 
+Transferring files is not necessary, a script run out of scratch can access files in any directory (assuming the user has permission). In the above case I am basically making a copy of my raw reads in my scratch space. This might be desirable if multiple users are using files and they are being moved, or you want to make a copy to ensure nothing happens to the original read files. 
+4) This creates the out directory if it does not already exist. Echo is a Linux command which basically means print - i.e. the line "checking if out directory exists" will print in your .out file. This is not necessary for creating the directory, just helpful to tell you what it’s doing. Below this is a for loop and conditional saying if out directory does not exist make it, if it does exist print "... exists". The "!" means does not exist and the -d indicates what follows will be a directory, in this case if outdir does not exist. 
 ```
 echo "Checking if ${outdir} exists ..."
 if [ ! -d ${outdir} ]
@@ -136,11 +144,11 @@ else
     echo " ... exists"
 fi
 ```
-5) Set variable called 'RUN to = slurm array task id (https://slurm.schedmd.com/job_array.html) which is a very cool tool for submitting a bunch of jobs at once, more explanation below. This isn’t really necessary but makes the following line a bit cleaner.
+5) Set variable called 'RUN' to = slurm array task id (https://slurm.schedmd.com/job_array.html). This is a very cool tool for submitting a bunch of jobs at once, more explanation below. Naming really necessary but makes the following line a bit cleaner.
 ```
 RUN=${SLURM_ARRAY_TASK_ID}
 ```
-6) Parse and defines input as the sample name that will be input to trim_galore. ls ${indir}/&ast;R1&ast; will list all files in in directory that have R1 anywhere in the name, the * wildcard is used here to mean find R1 embedded in any string of characters before or after. &ast;R1 would only look for R1 occurring at the end of any string of characters, R1&ast; would only look for R1 at the beginning. This is done to get each sample name listed one time (there will be an R1 and R2 in the indir assuming paired end reads). The '|' character 'pipes' commands, the output of ls is given to awk. awk here is being used to cut path file name at R1, -F is the field separator which is set here to R1. This results in names being split before and after the R1, '{print $1}' prints the first element of the split name, now we have each unique sample ID listed one time. sed here is being used to isolate the 'changed' input names. The slurm array task id will basically run through a list of all of the unique sample names, to input them one at a time sed -n followed by p prints only the file being processed by the slurm array. sed and awk are useful Linux tools however there are multiple ways to accomplish this string parsing to get the unique sample names.
+6) Parse and define input as the sample name that will be input to trim_galore. ls ${indir}/&ast;R1&ast; will list all files in in directory that have R1 anywhere in the name, the * wildcard is used here to mean find R1 embedded in any string of characters before or after. &ast;R1 would only look for R1 occurring at the end of any string of characters, R1&ast; would only look for R1 at the beginning. This is done to get each sample name listed one time (there will be an R1 and R2 in the indir assuming paired end reads). The '|' character 'pipes' commands, the output of ls is given to awk. awk here is being used to cut path file name at R1, -F is the field separator which here is set to R1. This results in names being split before and after the R1, '{print $1}' prints the first element of the split name, now we have each unique sample ID listed one time. sed here is being used to isolate the 'changed' input names. The slurm array task id will run through a list of all of the unique sample names, to input them one at a time sed -n followed by p prints only the file being processed by the slurm array. sed and awk are useful Linux tools but there are multiple ways to accomplish this string parsing to get the unique sample names.
 ```
 input=`ls ${indir}/*R1* | awk -F 'R1' '{print $1}'| sed -n ${RUN}p`
 ```
@@ -160,7 +168,7 @@ trim_galore -j 4 \
 ```
 sbatch trim_galore.bash
 ```
-If working on one project in scratch it would not be necessary to make further subdirectories for reads as is written here (reads is a subdirectory of exports in this example).
+If working on one project in scratch it would not be necessary to make further subdirectories for reads as is written here (reads is a subdirectory within exports in this example).
 
 # Quality control with Fastqc
 In this and following steps I will only go through new code elements that differ from trim_galore.
@@ -184,7 +192,7 @@ module load fastqc
 raw_reads=/pine/scr/o/m/omtorano/exports/reads        
 trim_reads=/pine/scr/o/m/omtorano/exports/trimmed_reads
 ```
-set out directory to where fastqc output should go, can make 2 directories to keep raw and trimmed output separate
+set out directory to where fastqc output should go, can make 2 directories to keep raw and trimmed output separate.
 ```
 outdir=/pine/scr/o/m/omtorano/exports/fastqc_output
 
@@ -199,7 +207,7 @@ else
 fi
 
 ```
-run fastqc on untrimmed raw reads and trimmed reads, reads will run simultaneously, set threads to # of reads
+run fastqc on untrimmed raw reads and trimmed reads, reads will run simultaneously, set threads to # of reads.
 ```
 fastqc -t 42 $raw_reads/* -o ${outdir}
 #run fastqc on trimmed reads, using *.gz searches for anything that ends with .gz, excludes trimming reports
@@ -211,13 +219,13 @@ cd ${outdir}
 module load multiqc
 multiqc . 
 ```
-The multiqc step will result in an .html file that can be dragged and dropped into a browser. This file contains the compiled fastq reports from all trimmed and raw reads. If there are certain samples that have low quality or vary from the rest of the samples this may indicate that these sample need to be removed from further analysis. Full multiqc output for the High Yield 2020 samples is saved in HighYield2020_multiqc_report.html, below is an example of what it looks like.. 
+The multiqc step will result in an .html file that can be dragged and dropped into a browser. This file contains the compiled fastq reports from all trimmed and raw reads. If there are certain samples that have low quality or vary from the rest of the samples this may indicate that these sample need to be removed from further analysis. Full multiqc output for the High Yield 2020 samples is saved in HighYield2020_multiqc_report.html, below is an example of what it looks like... 
 	
 ![image](https://user-images.githubusercontent.com/48129653/123166593-96a19000-d443-11eb-8f6b-e47c3c7fc0a1.png)
 
 
 # Assembly with Trinity
-The goal of assembly in this work flow is to create a de novo assembly from all samples in a 'group' which you can map back to in the alignment step. For the Exports High Yield 2020 samples were collected at two timepoints from two different depths, 1 & 4. I am interested in comparing between timepoints, not depths, I am therefore creating an assembly of all depth 1 samples and all depth 4 samples. This way I can compare samples collected at a single depth, instead of between both depths. 
+The goal of assembly in this work flow is to create a de novo assembly from all samples in a 'group' which you can use to map back to in the alignment step. For Exports High Yield 2020, samples were collected at two timepoints from two different depths, 1 & 4. I am interested in comparing between timepoints, not depths, I am therefore creating an assembly of all depth 1 samples and all depth 4 samples. This way I can compare samples collected at a single depth, instead of between both depths. 
 
 Trinity is one option for assembly tools, the other I will go through here (next section) is Spades. Trinity is a multipurpose tool that can do a lot more than assembly, read more here https://github.com/trinityrnaseq/trinityrnaseq/wiki. During assembly it runs through different phases (see wiki) that can be split into different jobs depending on how big an assembly you are trying to make. For this project the stats of my assemblies are below:
 
