@@ -254,7 +254,7 @@ Module loading trinity will automatically load bowtie/1.2.3, bowtie2/2.4.1, jell
 #SBATCH -J trinity
 #SBATCH -o trinity.%j_%a.out
 #SBATCH -e trinity.%j_%a.err
-#SBATCH --array=1-21%2
+#SBATCH --array=1-21%3
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=omtorano@unc.edu
 #SBATCH --mem=500G
@@ -263,9 +263,40 @@ Module loading trinity will automatically load bowtie/1.2.3, bowtie2/2.4.1, jell
 
 
 module load trinity	
+module load trinity
+#set in directory to where trimmed reads are stored
+indir=/pine/scr/o/m/omtorano/exports/trimmed_reads
+RUN=${SLURM_ARRAY_TASK_ID}
+input=`ls ${indir}/*R1*gz | awk -F 'R1' '{print $1}'| sed -n ${RUN}p`
+a=`basename ${input}`
+#make unique out directory for each sample by amending sample name to trinity outdir !!out directory must contain 'trinity'!!
+outdir=/pine/scr/o/m/omtorano/exports/assembly/${a}trinity/
+#hpc_cmds_GridRunner.pl is stored here
+griddir=/proj/marchlab/tools/HpcGridRunner
+	echo "Checking if ${outdir} exists ..."
+if [ ! -d ${outdir} ]
+then
+    echo "Create directory ... ${outdir}"
+    mkdir -p ${outdir}
+else
+    echo " ... exists"
+fi
 ```
-
-currently running in array without gridrunner
+The following trinity command is modeled after Natalie Cohen and Logan Whitehouse's examples. See the trinity github for details on specific flags. The grid_exec command will launch parallel jobs during the final phase of trinity and the .conf file has been optimized by Sara Haines. The locations of the .pl and .conf files (also included in this repo) should not change, so the paths to these files do not need to be modified unless they are moved. Within the trinity application there is the script TrinityStats.pl which will give details about the quality of the assembly (N50, # of contigs, longest contig, etc).
+```
+Trinity \
+	--seqType fq \
+	--max_memory 500G \
+	--left ${input}R1*gz \
+	--right ${input}R2*gz \
+	--CPU ${SLURM_CPUS_PER_TASK} \
+	--grid_exec "${griddir}/hpc_cmds_GridRunner.pl --grid_conf ${SLURM_SUBMIT_DIR}/hpc_conf/trinity_pipeline_longleaf_grid.conf -c" \
+	--full_cleanup \
+	--NO_SEQTK \
+	--output ${outdir}
+	/nas/longleaf/apps/trinity/2.8.6/trinityrnaseq-2.8.6/util/TrinityStats.pl ${outdir}/Trinity.fasta
+```
+Ideally Trinity will complete after ~2ish - 6ish days, even with the 'mail-user' sbatch option slurm will not send an email after job completion. Use the 'squeue -u <onyen>' command to check on the status of the array job. If there are hundreds of jobs in your queue this means trinity is running grid runner and is in phase 2. The .out files created by trinity also output the current status of the run. These files get huge as every single sequence is normalized and assembled. Errors during trinity runs can be cryptic, if a run runs out of time is will not say that in the .out file but it will in the .err file. If something is wrong with part of the command it will show up in the .out file but not the .err file. As written 
 	
 # CD hit
 https://github.com/weizhongli/cdhit/wiki/3.-User's-Guide
