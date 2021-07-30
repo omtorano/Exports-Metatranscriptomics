@@ -246,7 +246,7 @@ As of 6/23/3031 the newest version of Trinity available on longleaf is trinity/2
 	- using a docker or singularity image (https://github.com/trinityrnaseq/trinityrnaseq/wiki/Trinity-in-Docker#trinity_singularity), this should be easy but trinity does not currently support the use of the gridrunner tool (see below) on singularity
 	- downloading and compiling the newest version of trinity onto longleaf. I did not spend a lot of time on this but it is not that easy and I did not get it to work. When trinity is added using 'module load' additional packages are automatically added and the user environment (view by typing 'env' into command line) is automatically modified so all the libraries etc. have the right paths. This would need to be altered manually if trinity is run from a manually compiled version.
 	
-Module loading trinity will automatically load bowtie/1.2.3, bowtie2/2.4.1, jellyfish/2.2.10, trinity/2.8.6, perl/5.18.2, samtools/1.12, and salmon/0.9.1. Longleaf auto loading other necessary packages is a common thing and good to know about for a few reasons. 1) It does not always auto load the correct versions of these software tools. When I first started using trinity an old version of samtools was autoloaded, I emailed ITS about this and they fixed it so the correct version loaded. 2) If you are using multiple tools there may be conflicting versions of auto loaded software, this is common with python and perl. 
+Module loading trinity will automatically load bowtie/1.2.3, bowtie2/2.4.1, jellyfish/2.2.10, trinity/2.8.6, perl/5.18.2, samtools/1.12, and salmon/0.9.1. Longleaf auto loading other necessary packages is a common thing and good to know about for a few reasons. 1) It does not always auto load the correct versions of these software tools. When I first started using trinity an old version of samtools was autoloaded, I emailed ITS about this and they fixed it so the correct version loaded. 2) If you are using multiple tools there may be conflicting versions of auto loaded software, this is common with python and perl. An additional to the array flag is '%3', this will submit 3 jobs at once instead of submitting all 21. This is important because no directory, including scratch, has enough space to hold the intermediate files of more than ~6 trinity runs at once. I am going 3 here to be safe, if you reach your scratch space & file limit all jobs will fail.
 ```
 #!/bin/bash
 #SBATCH -N 1
@@ -296,7 +296,58 @@ Trinity \
 	--output ${outdir}
 	/nas/longleaf/apps/trinity/2.8.6/trinityrnaseq-2.8.6/util/TrinityStats.pl ${outdir}/Trinity.fasta
 ```
-Ideally Trinity will complete after ~2ish - 6ish days, even with the 'mail-user' sbatch option slurm will not send an email after job completion. Use the 'squeue -u <onyen>' command to check on the status of the array job. If there are hundreds of jobs in your queue this means trinity is running grid runner and is in phase 2. The .out files created by trinity also output the current status of the run. These files get huge as every single sequence is normalized and assembled. Errors during trinity runs can be cryptic, if a run runs out of time is will not say that in the .out file but it will in the .err file. If something is wrong with part of the command it will show up in the .out file but not the .err file. As written here if the job immidiatly fails it is likely an error in a path file. If it fails after running for days it could either be insufficent resources or a gridrunner error. For some reason the management of the gridrunner sometimes goes awry, you will be able to see if this has happened if there is a recursive_trinity.cmds.hpc-cache_success.__failures file in your trinity directory. As far as I can tell this is unavoidable and the huge difference in time to completion between trinity runs with and without the gridrunner flag makes using gridrunner worth it. Regardless of the source of the error, if the job has been running for days and fails the best option is to resubmit, triniity can pick up where it left off. 
+Ideally Trinity will complete after ~2ish - 6ish days, even with the 'mail-user' sbatch option slurm will not send an email after job completion. Use the 'squeue -u <onyen>' command to check on the status of the array job. If there are hundreds of jobs in your queue this means trinity is running grid runner and is in phase 2. The .out files created by trinity also output the current status of the run. These files get huge as every single sequence is normalized and assembled. Errors during trinity runs can be cryptic, if a run runs out of time is will not say that in the .out file but it will in the .err file. If something is wrong with part of the command it will show up in the .out file but not the .err file. As written here if the job immidiatly fails it is likely an error in a path file. If it fails after running for days it could either be insufficent resources or a gridrunner error. For some reason the management of the gridrunner sometimes goes awry, you will be able to see if this has happened if there is a recursive_trinity.cmds.hpc-cache_success.__failures file in your trinity directory. As far as I can tell this is unavoidable and the huge difference in time to completion between trinity runs with and without the gridrunner flag makes using gridrunner worth it. Regardless of the source of the error, if the job has been running for days and fails the best option is to resubmit, triniity can pick up where it left off. This is handled by the next part of the script.
+	
+If the final trinity output file does not exist this loop will create a new script called trinity_rerun.bash that is the same as what was just run but with fewer resources (after 6 days most of trinity is complete). This script will then be submitted, after 'then' is 'sbatch ${a}trinity_rerun.bash'. Within the created bash script is an additional loop that again checks for the final trinity output, if it is not present it resubmits the same rerun script. The danger with this is that sometimes gridrunner errors can not be solved by resubmission. If the rerun script has run 3+ times cancel it, edit the rerun script by deleting the --grid_exec command and resubmit. In both the outside and rerun loops if the final trinity.fasta file does exist it will delete the intermediate files. This is important because trinity creates a huge number of intermediate files. 
+```
+ echo "Checking completion ..."
+if [ ! -f ${outdir}.Trinity.fasta ]
+then
+
+cat<<EOF>${a}trinity_rerun.bash
+#!/bin/bash
+#SBATCH -N 1
+#SBATCH -t 2-00:00:00
+#SBATCH -J {a}trinity_
+#SBATCH -o {a}trinity_.%j.out
+#SBATCH -e {a}trinity_.%j.err
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mem=30G
+#SBATCH --cpus-per-task=1
+#SBATCH --ntasks=1
+
+Trinity \
+	--seqType fq \
+	--max_memory 100G \
+	--left ${input}R1*gz \
+	--right ${input}R2*gz \
+	--CPU ${SLURM_CPUS_PER_TASK} \
+	--grid_exec "${griddir}/hpc_cmds_GridRunner.pl --grid_conf ${SLURM_SUBMIT_DIR}/trinity_pipeline_longleaf_grid.conf -c" \
+	--full_cleanup \
+	--NO_SEQTK \
+	--output ${outdir}
+	/nas/longleaf/apps/trinity/2.8.6/trinityrnaseq-2.8.6/util/TrinityStats.pl ${outdir}/Trinity.fasta
+ 
+echo "Checking completion ..."
+if [ ! -f ${outdir}.Trinity.fasta ]
+then
+sbatch ${a}trinity_rerun.bash
+else
+    echo " ${outdir}.Trinity.fasta complete... Delete Trinity directory."
+	/nas/longleaf/apps/trinity/2.8.6/trinityrnaseq-2.8.6/util/TrinityStats.pl ${outdir}/Trinity.fasta
+	echo "I want to rm -r ${outdir}, but I'm scared"
+fi
+
+
+EOF
+
+sbatch ${a}trinity_rerun.bash
+else
+    echo " ${outdir}.Trinity.fasta complete... Delete Trinity directory."
+	/nas/longleaf/apps/trinity/2.8.6/trinityrnaseq-2.8.6/util/TrinityStats.pl ${outdir}/Trinity.fasta
+	echo "I want to rm -r ${outdir}, but I'm scared"
+fi
+```
 	
 # CD hit
 https://github.com/weizhongli/cdhit/wiki/3.-User's-Guide
