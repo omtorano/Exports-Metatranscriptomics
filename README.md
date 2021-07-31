@@ -1,4 +1,3 @@
-# Marchetti-lab-metatranscriptomics
 Annotated metatranscriptomics pipeline
 adapted from https://github.com/Lswhiteh/diatom-metatranscriptomics
 # Overview
