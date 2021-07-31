@@ -617,6 +617,6 @@ tpmphy<-merge(tpmphy,k, by ='TrinityID')
 See this site http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#input-data for more information about differential expression and biocmanager.
 	
 
-
+ More info on Spades and compiled useful unix commands to come :) 
 
 
