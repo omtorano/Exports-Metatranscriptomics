@@ -351,17 +351,272 @@ fi
 	
 # CD hit
 https://github.com/weizhongli/cdhit/wiki/3.-User's-Guide
-After assembling individual samples use CD hit to create "grand" assemblies, for Exports high yield created depth 1 and depth 4 assemblies
+After assembling individual samples use CD hit to create "grand" assemblies, for Exports high yield created depth 1 and depth 4 assemblies. Along with combining indivisual assemblies into depth assemblies, this reduces contig redundancy.
+```
+#!/bin/bash
+#SBATCH -p general
+#SBATCH -N 1
+#SBATCH -t 3-00:00:00
+#SBATCH -J cdhit_trinity
+#SBATCH -o cdhit_trinity.%j.out
+#SBATCH -e cdhit_trinity.%j.err
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=omtorano@email.unc.edu
+#SBATCH --mem=40G
+#SBATCH --cpus-per-task=16
+#SBATCH --ntasks=1
+
+indir=/proj/marchlab/projects/EXPORTS/metatranscriptomics/HighYield2020/assemblies/
+outdir=/pine/scr/o/m/omtorano/cdhit/
+# ifn is the combined (concatenated) assemblies
+input1=`ls ${indir}/*-1*fasta`
+input4=`ls ${indir}/*-4*fasta`
+ifn1="${outdir}/mega_assembly_depth1_trinity_renamed.fasta"
+ifn4="${outdir}/mega_assembly_depth4_trinity_renamed.fasta"
+ofn1="${outdir}/clustered_assembly_depth1.fasta"
+ofn4="${outdir}/clustered_assembly_depth4.fasta"
+
+echo "Checking if ${outdir} exists ..."
+if [ ! -d ${outdir} ]
+then
+    echo "Create directory ... ${outdir}"
+    mkdir -p ${outdir}
+else
+    echo " ... exists"
+fi
+
+echo "Checking if ${ifn1} exists ..."
+if [ ! -f "${ifn1}" ]
+then
+    echo "Create combined assembly ... ${ifn1}"
+    cat ${input1} > ${ifn1}
+else
+    echo " ... exists"
+fi
+
+echo "Checking if ${ifn4} exists ..."
+if [ ! -f "${ifn4}" ]
+then
+    echo "Create combined assembly ... ${ifn4}"
+    cat ${input4} > ${ifn4}
+else
+    echo " ... exists"
+fi
+
+
+
+# load default cdit
+module load cdhit
+
+echo "${ifn1}"
+echo "${ofn1}"
+
+cd-hit-est \
+ -i "${ifn}" \
+ -o "${ofn}" \
+ -c .98 -n 10 -d 100 \
+ -T ${SLURM_CPUS_PER_TASK} \
+ -M 40000 \
+
+echo "${ifn4}"
+echo "${ofn4}"
+
+cd-hit-est \
+ -i "${ifn4}" \
+ -o "${ofn4}" \
+ -c .98 -n 10 -d 100 \
+ -T ${SLURM_CPUS_PER_TASK} \
+ -M 40000 \
+
+# --------------------- 
+# sacct -j $SLURM_JOB_ID --format='JobID,user,elapsed, cputime, totalCPU,MaxRSS,MaxVMSize,ncpus,NTasks,ExitCode'
+
+scontrol show job $SLURM_JOB_ID
+```
 
 # Annotate
-Annotate with database of choice, in this project used KEGG for functional annotation and phylodb for taxinomic annotation. 
+Annotate with database of choice, in this project used KEGG for functional annotation and phylodb for taxonomic annotation. 
 Make database of choice unto diamond database, use diamond to blast genes against database.
+
+```
+#!/bin/bash
+
+#SBATCH -p general
+#SBATCH --nodes=1
+#SBATCH --time=0-24:00:00
+#SBATCH --mem=200G
+#SBATCH --ntasks=12
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=omtorano@email.unc.edu
+#SBATCH -J diamond_trinity
+#SBATCH -o diamond_trinity.%j.out
+#SBATCH -e diamond_trinity.%j.err
+
+module load diamond
+
+
+indir=/proj/marchlab/projects/EXPORTS/metatranscriptomics/HighYield2020/cdhit/
+
+outdir=/pine/scr/o/m/omtorano/annotation/
+
+#diamond makedb --in /proj/marchlab/data/phylodb/phylodb_1.076.pep.fa -d phylodb
+#diamond makedb --in /nas/longleaf/data/KEGG/KEGG/genes/fasta/genes.pep.fasta -d keggdb
+
+samples='clustered_assembly_depth1.fasta clustered_assembly_depth4.fasta'
+
+for s in `echo $samples`; do            
+
+#Need to blast against phyloDB and KEGG
+
+diamond makedb --in /proj/marchlab/data/phylodb/phylodb_1.076.pep.fa -d phylodb
+
+diamond blastx -d /proj/marchlab/data/phylodb/diamond_db/phylodb \
+	-q $indir/${s} \
+	-o $outdir/${s}phyloDB.m8 \
+	-p 12 -e 0.000001 -k 1
+	#-p = threads, -e =Maximum expected value to report an alignment (default=0.001), -k = max target seqs number (how many seqs/ puery to report alignments)
+
+diamond makedb --in /nas/longleaf/data/KEGG/KEGG/genes/fasta/genes.pep.fasta -d keggdb
+
+diamond blastx -d keggdb \
+	-q $indir/${s} \
+	-o $outdir/${s}kegg.m8  \
+	-p 12 -e 0.000001 -k 1
+	
+	
+done
+```
 For this project then used keggannot and fastannotation.py to format annotation files.
+
 # Align
-Align individual samples with "grand" assemblies. Used salmon for this project, create "grand" assembly indix, align with salmon quant.
+Align individual samples with "grand" assemblies. Used salmon for this project, create "grand" assembly index, align with salmon quant. This script would have to be modified depending on the identifier within the sample name that dictates "group". For this project I am using 1 & 4 within the sample name to differentiate between depth 1 and 4 but this is project dependent. 
+```
+#!/bin/bash
+#SBATCH -p general
+#SBATCH --nodes=1
+#SBATCH --time=0-03:00:00
+#SBATCH --mem=20G
+#SBATCH --ntasks=1
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=omtorano@email.unc.edu
+#SBATCH -J salmon_trin
+#SBATCH -o salmon_trin.%A.out
+#SBATCH -e salmon_trin.%A.err
+
+
+module load salmon
+
+indir=/proj/marchlab/projects/EXPORTS/metatranscriptomics/HighYield2020/Reads/pairedendtrimmed
+
+input1=`ls ${indir}/*-1*R1*gz | awk -F 'R1' '{print $1}'`
+input4=`ls ${indir}/*-4*R1*gz | awk -F 'R1' '{print $1}'`
+
+
+#First need to create index, then map
+salmon index -i /pine/scr/o/m/omtorano/alignment/trinity/assemblyindex \--transcripts /pine/scr/o/m/omtorano/annotation/trinity/fastanno_out/clustered_assembly_depth1_trinity.fasta -k 31
+for s in `echo $input1`; do 
+
+salmon quant -l A -i /pine/scr/o/m/omtorano/alignment/trinity/assemblyindex \
+	-1 ${input1}R1*.gz \
+	-2 $indir/R2*.gz \
+	-p 24 \
+	-o /pine/scr/o/m/omtorano/alignment/trinity/${input1}_quants_trinity
+done
+
+salmon index -i /pine/scr/o/m/omtorano/alignment/trinity/assemblyindex \--transcripts /pine/scr/o/m/omtorano/annotation/trinity/fastanno_out/clustered_assembly_depth4_trinity.fasta -k 31
+for s in `echo $input4`; do 
+
+salmon quant -l A -i /pine/scr/o/m/omtorano/alignment/trinity/assemblyindex \
+	-1 ${input1}R1*.gz \
+	-2 $indir/R2*.gz \
+	-p 24 \
+	-o /pine/scr/o/m/omtorano/alignment/trinity/${input1}_quants_trinity
+done
+```
+
 # Differential expression
-Use tximport to get all quant.sf files into correct format. 
-dont export files to csv, can export as R documents. 
+This can be done numerous ways using different tools. For example, there are tools within trinity that run r scipts to get differential expression. See this tutorial for more information https://southgreenplatform.github.io/trainings/trinityTrinotate/TP-trinity/. Most differential expression is done in R using tools within the biocmanager package which is part of the bioconductor project https://cran.r-project.org/web/packages/BiocManager/vignettes/BiocManager.html. At this point the route you take is so project dependent it is difficult to generalize. It is important to know what question you are trying to answer before blindly running scripts. For the rest of this tutorial I will only get into the beginning parts of using biocmanager. Here I use tximport to get all quant.sf files into correct format. To run r scripts on longleaf you must create a bash file that calls an r script. 
+	
+This simply gives the slurm options for the tximport.r file to be run with
+
+```
+#!/bin/bash
+#SBATCH -p general
+#SBATCH --nodes=1
+#SBATCH --time=0-03:00:00
+#SBATCH --mem=300G
+#SBATCH --ntasks=3
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=
+#SBATCH -J tximport
+#SBATCH -o tximport.%A.out
+#SBATCH -e tximport.%A.err
+
+module load r/4.0.1
+cd /pine/scr/o/m/omtorano/alignment/trinity/
+outdir=/pine/scr/o/m/omtorano/tximport/
+
+echo "Checking if ${outdir} exists ..."
+if [ ! -d ${outdir} ]
+then
+    echo "Create directory ... ${outdir}"
+    mkdir -p ${outdir}
+else
+    echo " ... exists"
+fi
+
+
+
+Rscript tximport.r
+```
+	
+Within tximport.r are the actual commands being run. This loads the packages necessary for biocmanager and the data manipulation to follow.
+```
+BiocManager::install('tximport')
+library(tximport)
+library(DESeq2)
+library(tidyverse)
+library(dplyr)
+library(stringr)
+	
+```
+Below the salmon output quant.sf files are being called and imported into r
+```
+samples<-list.files(path="//pine/scr/o/m/omtorano/alignment/trinity/", full.names=T)
+files<-file.path(samples,"quant.sf")
+names(files)<-str_replace(samples, "/pine/scr/o/m/omtorano/alignment/trinity/${input1}_quants_trinity","")%>%str_replace(".salmon","")
+tx2gene <- read.delim("/proj/marchlab/projects/PUPCYCLE_2019/mega_annotations/annotations/kegg_annotations/mega_kegg.tsv")
+txi.keggannot.transcriptlevel<-tximport(files,type="salmon",tx2gene=tx2gene[,c('query', 'KO')], txOut = TRUE)
+```
+The timing required for import varies by the number of quant.sf files and the size of these files, it is important to save intermediate steps, otherwise nothing will be saved until the final output and this script must be rerun fully to experiment with output.
+```
+txi.keggannot.transcriptlevel.1.rds <- saveRDS(txi.keggannot.transcriptlevel, "txi.keggannot.transcriptlevel.1.rds")
+kegg_tl<-readRDS('txi.keggannot.transcriptlevel.1.rds')
+rownames(kegg_tl) <- kegg_tl$X
+colnames(kegg_tl)[colnames(kegg_tl) == 'X'] <-'query'
+#phylodb annotations
+tx2gene1<-read.delim("/proj/marchlab/projects/PUPCYCLE_2019/mega_annotations/annotations/phylodb_annotations/megaphylodb.tsv")
+#import
+txi.phylodb.transcriptlevel<-tximport(files, type="salmon", tx2gene =tx2gene1[,c("TrinityID", "Organism")],txOut=TRUE)
+#save r data
+txi.phylodb.transcriptlevel.1.rds<-saveRDS(txi.phylodb.transcriptlevel, "txi.phylodb.transcriptlevel.1.rds")
+```
+This was an experiment with a subset of the total phylodb dataset and can be modified and expreimented with
+```								
+phylo<-read.csv('sub.phylo.csv', header=T)
+kegg<-read.csv('sub.phylo.csv', header=T)
+rownames(kegg)<-kegg$X
+colnames(kegg)[colnames(kegg)=='X']<-'TrinityID'
+
+p<-read.delim('/proj/marchlab/projects/PUPCYCLE_2019/mega_annotations/annotations/phylodb_annotations/megaphylodb.tsv')
+k<-read.delim('/proj/marchlab/projects/PUPCYCLE_2019/mega_annotations/annotations/kegg_annotations/mega_kegg.tsv')
+colnames(keggannot)[colnames(keggannot)=='query']<-'TrinityID'
+tpmphy<-merge(kegg, p, by ='TrinityID')
+tpmphy<-merge(tpmphy,k, by ='TrinityID')
+```
+See this site http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#input-data for more information about differential expression and biocmanager.
+	
+
 
 
 
