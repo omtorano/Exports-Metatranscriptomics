@@ -130,7 +130,7 @@ indir=/pine/scr/o/m/omtorano/exports/reads
 outdir=/pine/scr/o/m/omtorano/exports/trimmed_reads
 ```
 Transferring files is not necessary, a script run out of scratch can access files in any directory (assuming the user has permission). In the above case I am basically making a copy of my raw reads in my scratch space. This might be desirable if multiple users are accesing files and they are being moved, or you want to make a copy to ensure nothing happens to the original read files. 
-4) This creates the out directory if it does not already exist. Echo is a Linux command that prints - so the line "checking if out directory exists" will print in your .out file. This is not necessary for creating the directory, just helpful to tell you what it’s doing. Below this is a for loop and conditional saying if out directory does not exist make it, if it does exist print "... exists". The "!" means does not exist and the -d indicates what follows will be a directory, in this case if outdir does not exist. 
+4) This creates the out directory if it does not already exist. Echo is a Linux command that prints - so the line "checking if out directory exists" will print in your .out file. This is not necessary for creating the directory, just helpful to tell you what it’s doing. Below this is a conditional if/then statement saying if out directory does not exist then make it, if it does exist then print "... exists". The "!" means does not exist and the -d indicates what follows will be a directory, in this case if outdir does not exist, fi closes the conditional.
 ```
 echo "Checking if ${outdir} exists ..."
 if [ ! -d ${outdir} ]
@@ -141,11 +141,11 @@ else
     echo " ... exists"
 fi
 ```
-5) Set variable called 'RUN' to = slurm array task id (https://slurm.schedmd.com/job_array.html). This is a very cool tool for submitting a bunch of jobs at once, more explanation below. Naming really necessary but makes the following line a bit cleaner.
+5) Set variable called 'RUN' to = slurm array task id (https://slurm.schedmd.com/job_array.html). This is a very cool tool for submitting a bunch of jobs at once, more explanation below. Naming is really necessary but makes the following line a bit cleaner.
 ```
 RUN=${SLURM_ARRAY_TASK_ID}
 ```
-6) Parse and define input as the sample name that will be input to trim_galore. ls ${indir}/&ast;R1&ast; will list all files in in directory that have R1 anywhere in the name, the * wildcard is used here to mean find R1 embedded in any string of characters before or after. &ast;R1 would only look for R1 occurring at the end of any string of characters, R1&ast; would only look for R1 at the beginning. This is done to get each sample name listed one time (there will be an R1 and R2 in the indir assuming paired end reads). The '|' character 'pipes' commands, the output of ls is given to awk. awk here is being used to cut path file name at R1, -F is the field separator which here is set to R1. This results in names being split before and after the R1, '{print $1}' prints the first element of the split name, now we have each unique sample ID listed one time. sed here is being used to isolate the 'changed' input names. The slurm array task id will run through a list of all of the unique sample names, to input them one at a time sed -n followed by p prints only the file being processed by the slurm array. sed and awk are useful Linux tools but there are multiple ways to accomplish this string parsing to get the unique sample names.
+6) Parse and define input as the sample name that will be input to trim_galore. ls ${indir}/&ast;R1&ast; will list all files in indir that have R1 anywhere in the name, the * wildcard is used here to find R1 embedded within any string of characters. &ast;R1 would only look for R1 occurring at the end of any string of characters, R1&ast; would only look for R1 at the beginning. This is done to get each sample name listed one time (there will be one R1 and one R2 in the indir assuming paired end reads). The '|' character 'pipes' commands, the output of ls is given to awk. Here awk is being used to cut the path file name at R1, -F is the field separator which here is set to R1. This results in names being split before and after the R1, '{print $1}' prints the first element of the split name, now we have each unique sample ID listed one time. Here sed is being used to isolate the 'changed' input names. The slurm array task id will run through a list of all of the unique sample names, to input them one at a time sed -n followed by p prints only the file being processed by the slurm array. sed and awk are useful Linux tools but there are multiple ways to accomplish this string parsing to get the unique sample names.
 ```
 input=`ls ${indir}/*R1* | awk -F 'R1' '{print $1}'| sed -n ${RUN}p`
 ```
@@ -154,7 +154,7 @@ input=`ls ${indir}/*R1* | awk -F 'R1' '{print $1}'| sed -n ${RUN}p`
 echo -e "\nRun ID: ${RUN}"
 echo -e "\nSample: ${input}"
 ```
-8) Now the actual trimming part, -j tells it how many cores to use, --paired tells it these are paired end reads, ${input} puts the unique sample id being cycled through by the slurm array, and we add back on the R1 and R2 endings, using the * wildcard lets us not have to type the entire file name. I think due to python versions it will actually only run one core as written here.
+8) Now the actual trimming part, -j tells it how many cores to use, --paired tells it these are paired end reads, ${input} puts the unique sample id being cycled through by the slurm array, and we add back on the R1 and R2 endings, using the * wildcard which prevents having to type the entire file name. I think due to python versions it will actually only run one core.
 ```
 trim_galore -j 4 \
 	--paired ${input}R1* ${input}R2* \
@@ -232,10 +232,10 @@ Totals were calculated based on averages (total sequence length = average sequen
 
 Assembly is where things start to get complicated, depending on how many sequences you have and the questions you are trying to answer there are many different tools and ways to do it within those tools - there are lots of studies comparing different tools. I tried MANY different methods for assembly with varying success. The script described here will assemble each individual sample. They will then be combined into a depth 1 & 4 assembly in the next step (cdhit). 
 Some other things I tried: 
-	- assembling samples by triplicate and assembling those in cdhit - this resulted in relativly low mapping rates and took a lot of time and memory. In fact, assembling triplicates required Trinity to be broken up into multiple scripts due to maxed out memory.
+	- assembling samples by triplicate and combining the output in cdhit - this resulted in relativly low mapping rates and took a lot of time and memory. In fact, assembling triplicates required Trinity to be broken up into multiple scripts due to maxed out memory.
 	- assembling by depth (all depth 1 samples in one script and all depth 4 in another), never finished withing alloted time and memory even when broken down by phase. 
-	- using IDBA (never finished).
-	- Spades individual assemblies (see next section)
+	- using IDBA https://github.com/loneknightpy/idba (never finished).
+	- Spades individual assemblies https://github.com/ablab/spades (see next section)
 	- Spades depth assemblies (see next section)
 	
 As of 6/23/3031 the newest version of Trinity available on longleaf is trinity/2.8.6 and the newest version of trinity available is trinity/2.12.0. There have been some requests for ITS to update trinity but it has not happened. Options for running trinity include:
@@ -243,7 +243,7 @@ As of 6/23/3031 the newest version of Trinity available on longleaf is trinity/2
 	- using a docker or singularity image (https://github.com/trinityrnaseq/trinityrnaseq/wiki/Trinity-in-Docker#trinity_singularity), this should be easy but trinity does not currently support the use of the gridrunner tool (see below) on singularity
 	- downloading and compiling the newest version of trinity onto longleaf. I did not spend a lot of time on this but it is not that easy and I did not get it to work. When trinity is added using 'module load' additional packages are automatically added and the user environment (view by typing 'env' into command line) is automatically modified so all the libraries etc. have the right paths. This would need to be altered manually if trinity is run from a manually compiled version.
 	
-Module loading trinity will automatically load bowtie/1.2.3, bowtie2/2.4.1, jellyfish/2.2.10, trinity/2.8.6, perl/5.18.2, samtools/1.12, and salmon/0.9.1. Longleaf auto loading other necessary packages is a common thing and good to know about for a few reasons. 1) It does not always auto load the correct versions of these software tools. When I first started using trinity an old version of samtools was autoloaded, I emailed ITS about this and they fixed it so the correct version loaded. 2) If you are using multiple tools there may be conflicting versions of auto loaded software, this is common with python and perl. An additional to the array flag is '%3', this will submit 3 jobs at once instead of submitting all 21. This is important because no directory, including scratch, has enough space to hold the intermediate files of more than ~6 trinity runs at once. I am going 3 here to be safe, if you reach your scratch space & file limit all jobs will fail.
+Module loading trinity will automatically load bowtie/1.2.3, bowtie2/2.4.1, jellyfish/2.2.10, trinity/2.8.6, perl/5.18.2, samtools/1.12, and salmon/0.9.1. Longleaf auto loading other necessary packages is a common thing and good to know about for a few reasons. 1) It does not always auto load the correct versions of these software tools. When I first started using trinity an old version of samtools was autoloaded, I emailed ITS about this and they fixed it so the correct version loaded. 2) If you are using multiple tools there may be conflicting versions of auto loaded software, this is common with python and perl. An additiona to the array flag is '%3', this will submit 3 jobs at once instead of submitting all 21. This is important because no directory, including scratch, has enough space to hold the intermediate files of more than ~6 trinity runs at once. I am going 3 here to be safe, if you reach your scratch space & file limit all jobs will fail.
 ```
 #!/bin/bash
 #SBATCH -N 1
@@ -258,8 +258,6 @@ Module loading trinity will automatically load bowtie/1.2.3, bowtie2/2.4.1, jell
 #SBATCH --cpus-per-task=18
 #SBATCH --ntasks=1
 
-
-module load trinity	
 module load trinity
 #set in directory to where trimmed reads are stored
 indir=/pine/scr/o/m/omtorano/exports/trimmed_reads
@@ -293,7 +291,7 @@ Trinity \
 	--output ${outdir}
 	/nas/longleaf/apps/trinity/2.8.6/trinityrnaseq-2.8.6/util/TrinityStats.pl ${outdir}/Trinity.fasta
 ```
-Ideally Trinity will complete after ~2ish - 6ish days, even with the 'mail-user' sbatch option slurm will not send an email after job completion. Use the 'squeue -u <onyen>' command to check on the status of the array job. If there are hundreds of jobs in your queue this means trinity is running grid runner and is in phase 2. The .out files created by trinity also output the current status of the run. These files get huge as every single sequence is normalized and assembled. Errors during trinity runs can be cryptic, if a run runs out of time is will not say that in the .out file but it will in the .err file. If something is wrong with part of the command it will show up in the .out file but not the .err file. As written here if the job immidiatly fails it is likely an error in a path file. If it fails after running for days it could either be insufficent resources or a gridrunner error. For some reason the management of the gridrunner sometimes goes awry, you will be able to see if this has happened if there is a recursive_trinity.cmds.hpc-cache_success.__failures file in your trinity directory. As far as I can tell this is unavoidable and the huge difference in time to completion between trinity runs with and without the gridrunner flag makes using gridrunner worth it. Regardless of the source of the error, if the job has been running for days and fails the best option is to resubmit, triniity can pick up where it left off. This is handled by the next part of the script.
+Ideally Trinity will complete after ~2-6ish days, even with the 'mail-user' sbatch option slurm will not send an email after job completion. Use the 'squeue -u <onyen>' command to check on the status of the array job. If there are hundreds of jobs in your queue this means trinity is running grid runner and is in phase 2. The .out files created by trinity also output the current status of the run. These files get huge as every single sequence is normalized and assembled. Errors during trinity runs can be cryptic, if a run runs out of time is will not say that in the .out file but it will in the .err file. If something is wrong with part of the command it will show up in the .out file but not the .err file. As written here if the job immidiatly fails it is likely an error in a path file. If it fails after running for days it could either be insufficent resources or a gridrunner error. For some reason the management of the gridrunner sometimes goes awry, you will be able to see if this has happened if there is a recursive_trinity.cmds.hpc-cache_success.__failures file in your trinity directory. As far as I can tell this is unavoidable and the huge difference in time to completion between trinity runs with and without the gridrunner flag makes using gridrunner worth it. Regardless of the source of the error, if the job has been running for days and fails the best option is to resubmit, triniity can pick up where it left off. This is handled by the next part of the script.
 	
 If the final trinity output file does not exist this loop will create a new script called trinity_rerun.bash that is the same as what was just run but with fewer resources (after 6 days most of trinity is complete). This script will then be submitted, after 'then' is 'sbatch ${a}trinity_rerun.bash'. Within the created bash script is an additional loop that again checks for the final trinity output, if it is not present it resubmits the same rerun script. The danger with this is that sometimes gridrunner errors can not be solved by resubmission. If the rerun script has run 3+ times cancel it, edit the rerun script by deleting the --grid_exec command and resubmit. In both the outside and rerun loops if the final trinity.fasta file does exist it will delete the intermediate files. This is important because trinity creates a huge number of intermediate files. 
 ```
@@ -348,7 +346,7 @@ fi
 	
 # CD hit
 https://github.com/weizhongli/cdhit/wiki/3.-User's-Guide
-After assembling individual samples use CD hit to create "grand" assemblies, for Exports high yield created depth 1 and depth 4 assemblies. Along with combining indivisual assemblies into depth assemblies, this reduces contig redundancy.
+After assembling individual samples use CD hit to create "grand" assemblies, for Exports high yield created depth 1 and depth 4 assemblies. Along with combining individual assemblies into depth assemblies, this reduces contig redundancy.
 ```
 #!/bin/bash
 #SBATCH -p general
