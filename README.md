@@ -17,13 +17,13 @@ Once RNA extraction is complete, libraries have been prepped and sequenced, and 
 - Get on longleaf (UNC's high performance computing platform)
 	- Follow the instructions here https://its.unc.edu/research-computing/request-a-cluster-account/
 		- You'll need the following info, -> are my suggestions
-			- Your name and onyen: 
-			- Your Department: -> Marine Sciences or MASC
-			- Phone number to reach you while your jobs are running (if we need to): 
-			- Your Email address:
-			- Your preferred shell (bash or tcsh): -> bash
-			- Faculty sponsor name: -> Adrian Marchetti
-			- Faculty sponsor onyen: -> amarchet
+			- Your name and onyen
+			- Your Department -> Earth, Marine, and Environmental Sciences or EMES
+			- Phone number to reach you while your jobs are running
+			- Your Email address
+			- Your preferred shell (bash or tcsh) -> bash
+			- Faculty sponsor name -> Adrian Marchetti
+			- Faculty sponsor onyen -> amarchet
 			- Type of subscription: Longleaf or dogwood -> longleaf
 			- A description of the type of work you will do on the cluster -> bioinformatics/RNA seq/etc. something like that
 	- After you get longleaf access you may need to email ITS to get access to the Marchetti lab directory, in your email request access to /proj/marchlab and cc Adrian
