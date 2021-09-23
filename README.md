@@ -86,7 +86,6 @@ Rules for the Marchetti Lab /proj space
 - Use the rsync command to move files, mv deletes files from their original location and if interrupted will result in data loss.
 - Use the rm (remove) command CAREFULLY, permanently deletes files.
 - The recommended directory organization is to have directory for the project and separate sub directories for code, reads, assemblies, annotations, and alignment (optional trimmed reads and fastqc output).
-- See final section of page for useful stuff.
 
 # Trimming with trim_galore
 
