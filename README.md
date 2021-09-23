@@ -14,7 +14,7 @@ The general steps this pipeline follows are:
 ## Before Getting started
 Once RNA extraction is complete, libraries have been prepped and sequenced, and sequences have been delivered the following steps are necessary to access and analyze seqs
 
-- Get on longleaf (UNC's high performance computing platform)
+- Get on Longleaf (UNC's high performance computing platform)
 	- Follow the instructions here https://its.unc.edu/research-computing/request-a-cluster-account/
 		- You'll need the following info, my suggestions are in *italics*
 			- Your name and onyen
