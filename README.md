@@ -25,7 +25,7 @@ Once RNA extraction is complete, libraries have been prepped and sequenced, and 
 			- Faculty sponsor name -> *Adrian Marchetti*
 			- Faculty sponsor onyen -> *amarchet*
 			- Type of subscription: Longleaf or dogwood -> *longleaf*
-			- A description of the type of work you will do on the cluster -> bioinformatics/RNA seq/etc. something like that
+			- A description of the type of work you will do on the cluster -> *bioinformatics/RNA seq/etc. something like that*
 	- After you get longleaf access you may need to email ITS to get access to the Marchetti lab directory, in your email request access to /proj/marchlab and cc Adrian
 - Find a platform for accessing longleaf that works for you https://its.unc.edu/research-computing/getting-logged-on/
 	- There are many ways to do this. Some options include using longleaf desktop https://ondemand.rc.unc.edu/pun/sys/dashboard/ (Sarah's preferred method), doing everything (navigating directories, editing files, etc.) from a terminal (Johnson's preferred method), doing hybrid terminal and file manager (my preferred method, on Windows I use a GitBash and WinSCP file manager, it works for me). 
