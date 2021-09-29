@@ -619,16 +619,16 @@ https://www.schedmd.com/
 	
 https://slurm.schedmd.com/pdfs/summary.pdf
 	
-squeue -u <onyen>
+squeue -u &lt;onyen&gt;
 	
-seff <job number>
+seff &lt;job number&gt;
 	
-jobhist.sh -g=<job name> -s=<YYYY-MM-DD>
+jobhist.sh -g=&lt;job name&gt; -s=&lt;YYYY-MM-DD&gt;
 	
 sh to run script on login node, not submit as job
 	
 number of files in dir and all subdirs
-find <path/to/dir> -type f -print | wc -l
+find &lt;path/to/dir&gt; -type f -print | wc -l
 '~' = home dir ex takes you home
 	
 ```
@@ -637,7 +637,7 @@ cd ~
 	
 less &lt;file&gt;
 	
-search within less with /<search term>, use space bar to page down, :G for end of page :g for top
+search within less with /&lt;search term&gt;, use space bar to page down, :G for end of page :g for top
 	
 history | less
 	
@@ -647,9 +647,9 @@ Replacing script input with $# enables user to input upon submission
 	
 eg rsync $1 $2 -> sh file/path/1 file/path/2
 	
-longleaf interactive session srun -p interact --pty <program> https://its.unc.edu/research-computing/techdocs/longleaf-slurm-examples/
+longleaf interactive session srun -p interact --pty &lt;program&gt; https://its.unc.edu/research-computing/techdocs/longleaf-slurm-examples/
 	
-grep <search term> <file>
+grep &lt;search term> &lt;file&gt;
 	
 #to get unique taxa in phylodb /proj/marchlab/data/phylodb/phylodb_1.076.pep.fa | awk {'printf ("%3s\t%s\n",$3,$4)'}
 unique lines sort -u
