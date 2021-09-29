@@ -615,27 +615,21 @@ See this site http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/
  More info on Spades to come :) 
 
 # Useful Bash/Unix/Slurm things
-https://www.schedmd.com/
-	
-https://slurm.schedmd.com/pdfs/summary.pdf
-	
-squeue -u &lt;onyen&gt;
-	
-seff &lt;job number&gt;
-	
-jobhist.sh -g=&lt;job name&gt; -s=&lt;YYYY-MM-DD&gt;
-	
-sh to run script on login node, not submit as job
-	
-number of files in dir and all subdirs
-	
-find &lt;path/to/dir&gt; -type f -print | wc -l
-	
-'~' = home dir ex takes you home
-	
-cd ~
-	
-less &lt;file&gt;
+## Slurm
+- See 'documentation' https://www.schedmd.com/
+- Commands cheat sheet https://slurm.schedmd.com/pdfs/summary.pdf
+- Frequently used commands:
+	- squeue -u &lt;onyen&gt;
+	- seff &lt;job number&gt;
+	- sh &lt;script&gt; to run script on login node, not submit as job (use sbatch to submit as job)
+- jobhist.sh is in the /proj/marchlab/slurm_tools/ directory, it is a Sara Haines script that organizes seff and sacct output. Shows all jobs submitted by user with given job name for date range. jobhist.sh -g=&lt;job name&gt; -s=&lt;YYYY-MM-DD&gt;
+
+## Bash/Unix
+- https://askubuntu.com/questions/172481/is-bash-scripting-the-same-as-shell-scripting
+- number of files in dir and all subdirs find &lt;path/to/dir&gt; -type f -print | wc -l
+- '~' = home dir ex: cd ~ takes you home
+- View contents of file less &lt;file&gt; - does not work for binary files
+- 
 	
 search within less with /&lt;search term&gt;, use space bar to page down, :G for end of page :g for top
 	
