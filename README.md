@@ -47,7 +47,8 @@ cd /proj/marchlab/projects/EXPORTS/metatranscriptomics/
 
 ### mkdir makes a directory, here I am making the directory HighYield2020 and subdirectory Reads
 
-mkdir HighYield2020/Reads
+mkdir HighYield2020/
+mkdir HighYield2020/Reads/
 
 ### the beginning of the directions from Genewiz - connect to their server via sftp using the email in the instructions
 
