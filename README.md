@@ -612,7 +612,7 @@ tpmphy<-merge(tpmphy,k, by ='TrinityID')
 See this site http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#input-data for more information about differential expression and biocmanager.
 	
 
- More info on Spades and compiled useful unix commands to come :) 
+ More info on Spades to come :) 
 
 # Useful Bash/Unix/Slurm things
 https://www.schedmd.com/
@@ -628,12 +628,12 @@ jobhist.sh -g=&lt;job name&gt; -s=&lt;YYYY-MM-DD&gt;
 sh to run script on login node, not submit as job
 	
 number of files in dir and all subdirs
+	
 find &lt;path/to/dir&gt; -type f -print | wc -l
+	
 '~' = home dir ex takes you home
 	
-```
 cd ~
-```
 	
 less &lt;file&gt;
 	
@@ -647,11 +647,14 @@ Replacing script input with $# enables user to input upon submission
 	
 eg rsync $1 $2 -> sh file/path/1 file/path/2
 	
-longleaf interactive session srun -p interact --pty &lt;program&gt; https://its.unc.edu/research-computing/techdocs/longleaf-slurm-examples/
+longleaf interactive session srun -p interact --pty &lt;program&gt; 
+	
+https://its.unc.edu/research-computing/techdocs/longleaf-slurm-examples/
 	
 grep &lt;search term> &lt;file&gt;
 	
 #to get unique taxa in phylodb /proj/marchlab/data/phylodb/phylodb_1.076.pep.fa | awk {'printf ("%3s\t%s\n",$3,$4)'}
+	
 unique lines sort -u
 	
 line lengths with awk https://riptutorial.com/awk/example/17378/length--string--
