@@ -616,27 +616,44 @@ See this site http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/
 
 # Useful Bash/Unix/Slurm things
 https://www.schedmd.com/
+	
 https://slurm.schedmd.com/pdfs/summary.pdf
+	
 squeue -u <onyen>
+	
 seff <job number>
+	
 jobhist.sh -g=<job name> -s=<YYYY-MM-DD>
+	
 sh to run script on login node, not submit as job
+	
 number of files in dir and all subdirs
 find <path/to/dir> -type f -print | wc -l
 '~' = home dir ex takes you home
+	
 ```
 cd ~
 ```
+	
 less <file>
+	
 search within less with /<search term>, use space bar to page down, :G for end of page :g for top
+	
 history | less
+	
 '?' is individual character wildcard, can be combined '???' = 3 wildcard characters
+	
 Replacing script input with $# enables user to input upon submission
+	
 eg rsync $1 $2 -> sh file/path/1 file/path/2
+	
 longleaf interactive session srun -p interact --pty <program> https://its.unc.edu/research-computing/techdocs/longleaf-slurm-examples/
+	
 grep <search term> <file>
+	
 #to get unique taxa in phylodb /proj/marchlab/data/phylodb/phylodb_1.076.pep.fa | awk {'printf ("%3s\t%s\n",$3,$4)'}
 unique lines sort -u
+	
 line lengths with awk https://riptutorial.com/awk/example/17378/length--string--
 
 
