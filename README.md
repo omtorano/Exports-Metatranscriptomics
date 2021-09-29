@@ -635,7 +635,7 @@ find <path/to/dir> -type f -print | wc -l
 cd ~
 ```
 	
-less <file>
+less &lt;file&gt;
 	
 search within less with /<search term>, use space bar to page down, :G for end of page :g for top
 	
