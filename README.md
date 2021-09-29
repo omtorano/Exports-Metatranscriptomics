@@ -35,8 +35,7 @@ Once RNA extraction is complete, libraries have been prepped and sequenced, and 
 - Make a new directory within /proj/marchlab/projects for your project, or new subdirectory within one of the existing project directories. Then download sequences if sequencing was done by an outside service (not UNC's High Throughput Sequencing facility HTSF)
 	- For example - when I got sequences for the High Yield 2020 EXPORTS project I made a directory within the existing Exports project folder called /HighYield2020. The sequencing was completed at Genewiz, who sent email detailing how to transfer files with sftp. This is an example of what this would look like:
 
-		- log into longleaf with your email 
-			- ssh <onyen@longleaf.unc.edu>
+		- log into longleaf with your email: ssh <onyen@longleaf.unc.edu>
 		- password prompt will come up automatically, you will not be able to see characters as you type them
 			- Password: <enter password here>
 		- make project directory
