@@ -14,6 +14,7 @@ The general steps this pipeline follows are:
 ## Before Getting started
 Once RNA extraction is complete, libraries have been prepped and sequenced, and sequences have been delivered the following steps are necessary to access and analyze seqs
 
+### Get on lonleaf
 - Get on Longleaf (UNC's high performance computing platform)
 	- Follow the instructions here https://its.unc.edu/research-computing/request-a-cluster-account/
 		- You'll need the following info, my suggestions are in *italics*
@@ -30,29 +31,20 @@ Once RNA extraction is complete, libraries have been prepped and sequenced, and 
 - Find a platform for accessing longleaf that works for you https://its.unc.edu/research-computing/getting-logged-on/
 	- There are many ways to do this. Some options include using longleaf desktop https://ondemand.rc.unc.edu/pun/sys/dashboard/, doing everything (navigating directories, editing files, etc.) from a terminal, doing hybrid terminal and file manager (my preferred method, on Windows I use a GitBash terminal, WinSCP file manager, and Notepad++ text editor. For a mac I recommend the default terminal, FileZilla file manager, and Atom text editor). 
 - Using longleaf off campus requires a VPN https://help.unc.edu/sp?id=kb_article_view&sysparm_article=KB0010155&sys_kb_id=719db1eddb3fa41070551ffa689619eb
+### Get sequences
 - Make a new directory within /proj/marchlab/projects for your project, or new subdirectory within one of the existing project directories. Then download sequences if sequencing was done by an outside service (not UNC's High Throughput Sequencing facility HTSF)
-	- For example - when I got sequences for the High Yield 2020 EXPORTS project I made a directory within the existing Exports project folder called /HighYield2020. The sequencing was completed at Genewiz, who sent email detailing how to transfer files with sftp. This is an example of what this would look like (JUST AN EXAMPLE, DO NOT RUN):
-```
-### log into longleaf with your email
+	- For example - when I got sequences for the High Yield 2020 EXPORTS project I made a directory within the existing Exports project folder called /HighYield2020. The sequencing was completed at Genewiz, who sent email detailing how to transfer files with sftp. This is an example of what this would look like:
 
-ssh omtorano@longleaf.unc.edu
-
-### password prompt will come up automatically, you will not be able to see characters as you type them
-
-Password: <enter password here>
-
-### cd changes directory
-
-cd /proj/marchlab/projects/EXPORTS/metatranscriptomics/
-
-### mkdir makes a directory, here I am making the directory HighYield2020 and subdirectory Reads
-
-mkdir HighYield2020/
-mkdir HighYield2020/Reads/
-
-### the beginning of the directions from Genewiz - connect to their server via sftp using the email in the instructions
-
-sftp a_marchetti_lab_gmail@sftp.genewiz.com
+		- log into longleaf with your email 
+			- ssh <onyen@longleaf.unc.edu>
+		- password prompt will come up automatically, you will not be able to see characters as you type them
+			- Password: <enter password here>
+		- make project directory
+			- mkdir /proj/marchlab/projects/<project folder>/
+		- make reads directory, my directory is /proj/marchlab/projects/EXPORTS/metatranscriptomics/HighYield2020/Reads
+			- mkdir /proj/marchlab/projects/<project filder>/reads
+		- beginning of the directions from Genewiz - connect to their server via sftp (!see emailed instructions from Genewiz for more details!)
+			- sftp <login name Genewiz gave>@sftp.genewiz.com
 
 ### password prompt will come up automatically, enter the password they sent via email
 
