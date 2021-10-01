@@ -36,63 +36,38 @@ Once RNA extraction is complete, libraries have been prepped and sequenced, and 
 	- For example - when I got sequences for the High Yield 2020 EXPORTS project I made a directory within the existing Exports project folder called /HighYield2020. The sequencing was completed at Genewiz, they sent email detailing how to transfer files with sftp. This is an example of what this would look like:
 
 		- Log into longleaf with your email: 
-
 			ssh <onyen@longleaf.unc.edu>
-
 		- Password prompt will come up automatically, you will not be able to see characters as you type them: 
-		
 			Password: &lt;enter password here&gt;
-		
 		- Make project directory: 
-
 			mkdir /proj/marchlab/projects/&lt;project folder&gt;/
-		
 		- Make reads directory, my directory is /proj/marchlab/projects/EXPORTS/metatranscriptomics/HighYield2020/Reads: 
-			
 			mkdir /proj/marchlab/projects/&lt;project filder&gt;/reads
-		
 		- Beginning of the directions from Genewiz - connect to their server via sftp (!see emailed instructions from Genewiz for more details!): 
-			
 			sftp &lt;login name Genewiz gave&gt;@sftp.genewiz.com
-		
 		- Password prompt will come up automatically, enter the password they sent via email: 
-			
 			password: &lt;enter password genewiz sent here&gt;
-		
 		- Set local directory (where you want your reads to go on longleaf), this does not change working directory (where you are): 
-		
 			lcd /proj/marchlab/projects/&lt;project filder&gt;/reads
-		
 		- View items in the working directory, likely it will have the name of the Genewiz project number: 
-			
 			ls
-		
 		- change directory into directory listed by ls: 
-			
 			cd &lt;genewiz project folder name that just came up from ls command&gt;
-		
 		- View items again: 
-			
 			ls
-		
 		- If there is an additional directory listed (likely something like 00_fasta) change into that directory: 
-		 
 			cd &lt;additonal sub directory&gt;
-		
 		- Transfer files from working directory to local directory: 
-			
 			mget *
-		
 			- The '*' is a Linux wildcard, here used to indicate all files 
 			- Depending on the number of files this may take a long time and needs uninterrupted terminal connection, running this command does not delete filed off the Genewiz server so in the connection is interrupted just run above commands again.
 		- End the sftp connection to transfer yourself back to longleaf: 
-			
 			quit 
 
 ## Getting Started
 Rules for the Marchetti Lab /proj space
 - Do not work in the proj space, it is only for storage of 'final product' files from each stage in pipeline. We have a history of running out of space, storage availability can be tracked here https://rc-storage-info.its.unc.edu:32000.
-- Instead work in scratch (/pine/scr/o/n/onyen, for example my path is /pine/scr/o/m/omtorano) or home directory (/nas/longleaf/home/onyen). Scratch has tons of space but inactive files will be deleted by ITS after ~30days, they send an email before deletion.
+- Instead work in scratch (/pine/scr/&lt;o&gt;/&lt;n&gt;/&lt;onyen&gt;, for example my path is /pine/scr/o/m/omtorano) or home directory (/nas/longleaf/home/&lt;onyen&gt;). Scratch has tons of space but inactive files will be deleted by ITS after ~30 days, they send an email before deletion.
 - Use the rsync command to move files, mv deletes files from their original location and if interrupted will result in data loss.
 - Use the rm (remove) command CAREFULLY, permanently deletes files.
 - The recommended directory organization is to have directory for the project and separate sub directories for code, reads, assemblies, annotations, and alignment (optional trimmed reads and fastqc output).
