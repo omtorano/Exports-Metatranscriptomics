@@ -36,41 +36,21 @@ Once RNA extraction is complete, libraries have been prepped and sequenced, and 
 	- For example - when I got sequences for the High Yield 2020 EXPORTS project I made a directory within the existing Exports project folder called /HighYield2020. The sequencing was completed at Genewiz, who sent email detailing how to transfer files with sftp. This is an example of what this would look like:
 
 		- log into longleaf with your email: ssh <onyen@longleaf.unc.edu>
-		- password prompt will come up automatically, you will not be able to see characters as you type them
-			- Password: <enter password here>
-		- make project directory
-			- mkdir /proj/marchlab/projects/<project folder>/
-		- make reads directory, my directory is /proj/marchlab/projects/EXPORTS/metatranscriptomics/HighYield2020/Reads
-			- mkdir /proj/marchlab/projects/<project filder>/reads
-		- beginning of the directions from Genewiz - connect to their server via sftp (!see emailed instructions from Genewiz for more details!)
-			- sftp <login name Genewiz gave>@sftp.genewiz.com
+		- password prompt will come up automatically, you will not be able to see characters as you type them: Password: <enter password here>
+		- make project directory: mkdir /proj/marchlab/projects/<project folder>/
+		- make reads directory, my directory is /proj/marchlab/projects/EXPORTS/metatranscriptomics/HighYield2020/Reads: mkdir /proj/marchlab/projects/<project filder>/reads
+		- beginning of the directions from Genewiz - connect to their server via sftp (!see emailed instructions from Genewiz for more details!): sftp <login name Genewiz gave>@sftp.genewiz.com
+		- password prompt will come up automatically, enter the password they sent via email: password: <enter password genewiz sent here>
+		- Set local directory (where you want your reads to go on longleaf), this does not change working directory (where you are): lcd /proj/marchlab/projects/<project filder>/reads
+		- View items in the working directory, likely it will have the name of the Genewiz project number: ls
+		- change directory into directory listed by ls: cd <genewiz project folder name that just came up from ls command>
+		- View items again: ls
+		- If there is an additional directory listed (likely something like 00_fasta) change into that directory: cd <additonal sub directory>
+		- Transfer files from working directory to local directory: mget *
+			- The '*' is a Linux wildcard, here used to indicate all files 
+			- Depending on the number of files this may take a long time and needs uninterrupted terminal connection, running this command does not delete filed off the Genewiz server so in the connection is interrupted just run above commands again.
+		- End the sftp connection to transfer yourself back to longleaf: quit 
 
-### password prompt will come up automatically, enter the password they sent via email
-
-password: <enter password genewiz sent here>
-
-### lcd sets the local directory (where you want your reads to go), does not change working directory (does not change where you are)
-
-lcd /proj/marchlab/projects/EXPORTS/metatranscriptomics/HighYield2020/Reads
-
-### ls lists items in the current working directory, in this case I just logged onto Genewiz so I am seeing the list of directories
-### I have access to - likely there will be one and it will have the name of the Genewiz project number
-
-ls
-
-### change directory into whatever directory was just listed by ls
-
-cd <genewiz project folder name that just came up from ls command>
-
-### mget transfers files from working directory to whatever you set as your local directory. The '*' is a Linux wildcard that here 
-### means 'get all the stuff'
-
-mget *
-
-### end the sftp connection to transfer yourself back to longleaf
-
-quit #Is this the command that ends sftp connection?
-```
 ## Getting Started
 Rules for the Marchetti Lab /proj space
 - Do not work in the proj space, it is only for storage of 'final product' files from each stage in pipeline. We have a history of running out of space, storage availability can be tracked here https://rc-storage-info.its.unc.edu:32000.
