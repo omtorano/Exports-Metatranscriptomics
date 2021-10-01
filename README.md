@@ -36,28 +36,40 @@ Once RNA extraction is complete, libraries have been prepped and sequenced, and 
 	- For example - when I got sequences for the High Yield 2020 EXPORTS project I made a directory within the existing Exports project folder called /HighYield2020. The sequencing was completed at Genewiz, they sent email detailing how to transfer files with sftp. This is an example of what this would look like:
 
 		- Log into longleaf with your email: 
+			
 			ssh <onyen@longleaf.unc.edu>
 		- Password prompt will come up automatically, you will not be able to see characters as you type them: 
+			
 			Password: &lt;enter password here&gt;
 		- Make project directory: 
+			
 			mkdir /proj/marchlab/projects/&lt;project folder&gt;/
 		- Make reads directory, my directory is /proj/marchlab/projects/EXPORTS/metatranscriptomics/HighYield2020/Reads: 
+			
 			mkdir /proj/marchlab/projects/&lt;project filder&gt;/reads
 		- Beginning of the directions from Genewiz - connect to their server via sftp (!see emailed instructions from Genewiz for more details!): 
+			
 			sftp &lt;login name Genewiz gave&gt;@sftp.genewiz.com
 		- Password prompt will come up automatically, enter the password they sent via email: 
+			
 			password: &lt;enter password genewiz sent here&gt;
 		- Set local directory (where you want your reads to go on longleaf), this does not change working directory (where you are): 
+			
 			lcd /proj/marchlab/projects/&lt;project filder&gt;/reads
 		- View items in the working directory, likely it will have the name of the Genewiz project number: 
+			
 			ls
 		- change directory into directory listed by ls: 
+			
 			cd &lt;genewiz project folder name that just came up from ls command&gt;
 		- View items again: 
+			
 			ls
 		- If there is an additional directory listed (likely something like 00_fasta) change into that directory: 
+			
 			cd &lt;additonal sub directory&gt;
 		- Transfer files from working directory to local directory: 
+			
 			mget *
 			- The '*' is a Linux wildcard, here used to indicate all files 
 			- Depending on the number of files this may take a long time and needs uninterrupted terminal connection, running this command does not delete filed off the Genewiz server so in the connection is interrupted just run above commands again.
