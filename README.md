@@ -37,7 +37,7 @@ Once RNA extraction is complete, libraries have been prepped and sequenced, and 
 
 		- Log into longleaf with your email: 
 			
-			ssh &lt;onyen@longleaf.unc.edu&gt;
+			ssh &lt;onyen&gt;@longleaf.unc.edu
 		- Password prompt will come up automatically, you will not be able to see characters as you type them: 
 			
 			Password: &lt;enter password here&gt;
