@@ -623,31 +623,17 @@ See this site http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/
 
 ## Bash/Unix
 - https://askubuntu.com/questions/172481/is-bash-scripting-the-same-as-shell-scripting
-- number of files in dir and all subdirs find &lt;path/to/dir&gt; -type f -print | wc -l
-- '~' = home dir ex: cd ~ takes you home
-- View contents of file less &lt;file&gt; - does not work for binary files
-- 
-	
-search within less with /&lt;search term&gt;, use space bar to page down, :G for end of page :g for top
-	
-history | less
-	
-'?' is individual character wildcard, can be combined '???' = 3 wildcard characters
-	
-Replacing script input with $# enables user to input upon submission
-	
-eg rsync $1 $2 -> sh file/path/1 file/path/2
-	
-longleaf interactive session srun -p interact --pty &lt;program&gt; 
-	
-https://its.unc.edu/research-computing/techdocs/longleaf-slurm-examples/
-	
-grep &lt;search term> &lt;file&gt;
-	
-#to get unique taxa in phylodb /proj/marchlab/data/phylodb/phylodb_1.076.pep.fa | awk {'printf ("%3s\t%s\n",$3,$4)'}
-	
-unique lines sort -u
-	
-line lengths with awk https://riptutorial.com/awk/example/17378/length--string--
+- number of files in dir and all subdirs *find &lt;path/to/dir&gt; -type f -print | wc -l*
+- *~* = home dir ex: *cd ~* takes you home
+- View contents of file *less &lt;file&gt;* - does not work for binary files
+- search within less with */&lt;search term&gt;*, use space bar to page down, *G* for end of page *g* for top
+- search prevous commands *history | less*
+- *?* is individual character wildcard, can be combined '???' = 3 wildcard characters
+- replacing script input with *$&lt;#&gt;* enables user to input upon submission eg: a script.sh containing *rsync $1 $2* -> *sh script.sh file/path/1 file/path/2*
+- longleaf interactive session *srun -p interact --pty &lt;program&gt;* see https://its.unc.edu/research-computing/techdocs/longleaf-slurm-examples/
+- search a file *grep &lt;search term&gt; &lt;file&gt;*
+- to get unique taxa in phylodb */proj/marchlab/data/phylodb/phylodb_1.076.pep.fa | awk {'printf ("%3s\t%s\n",$3,$4)'}*
+- unique lines *sort -u &lt;file&gt;*
+- line lengths with awk https://riptutorial.com/awk/example/17378/length--string--
 
 
