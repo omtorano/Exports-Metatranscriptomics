@@ -619,6 +619,8 @@ See this site http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/
 	- squeue -u &lt;onyen&gt;
 	- seff &lt;job number&gt;
 	- sh &lt;script&gt; to run script on login node, not submit as job (use sbatch to submit as job)
+	- scancel 
+	- scancel -u 
 - jobhist.sh is in the /proj/marchlab/slurm_tools/ directory, it is a Sara Haines script that organizes seff and sacct output. Shows all jobs submitted by user with given job name for date range. jobhist.sh -g=&lt;job name&gt; -s=&lt;YYYY-MM-DD&gt;
 
 ## Bash/Unix
@@ -635,5 +637,6 @@ See this site http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/
 - to get unique taxa in phylodb */proj/marchlab/data/phylodb/phylodb_1.076.pep.fa | awk {'printf ("%3s\t%s\n",$3,$4)'}*
 - unique lines *sort -u &lt;file&gt;*
 - line lengths with awk https://riptutorial.com/awk/example/17378/length--string--
+
 
 
