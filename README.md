@@ -235,7 +235,7 @@ Some other things I tried:
 	- Spades individual assemblies https://github.com/ablab/spades (see next section)
 	- Spades depth assemblies (see next section)
 	
-As of 6/23/3031 the newest version of Trinity available on longleaf is trinity/2.8.6 and the newest version of trinity available is trinity/2.12.0. There have been some requests for ITS to update trinity but it has not happened. Options for running trinity include:
+As of 6/23/2021 the newest version of Trinity available on longleaf is trinity/2.8.6 and the newest version of trinity available is trinity/2.12.0. There have been some requests for ITS to update trinity but it has not happened. Options for running trinity include:
 	- using the available version on longleaf, easiest and what is described below 
 	- using a docker or singularity image (https://github.com/trinityrnaseq/trinityrnaseq/wiki/Trinity-in-Docker#trinity_singularity), this should be easy but trinity does not currently support the use of the gridrunner tool (see below) on singularity
 	- downloading and compiling the newest version of trinity onto longleaf. I did not spend a lot of time on this but it is not that easy and I did not get it to work. When trinity is added using 'module load' additional packages are automatically added and the user environment (view by typing 'env' into command line) is automatically modified so all the libraries etc. have the right paths. This would need to be altered manually if trinity is run from a manually compiled version.
