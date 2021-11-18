@@ -74,6 +74,7 @@ Once RNA extraction is complete, libraries have been prepped and sequenced, and 
 			- The '*' is a Linux wildcard, here used to indicate all files 
 			- Depending on the number of files this may take a long time and needs uninterrupted terminal connection, running this command does not delete filed off the Genewiz server so in the connection is interrupted just run above commands again.
 		- End the sftp connection to transfer yourself back to longleaf: 
+
 			quit 
 
 ## Getting Started
