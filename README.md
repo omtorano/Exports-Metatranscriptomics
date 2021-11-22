@@ -638,6 +638,6 @@ See this site http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/
 - to get unique taxa in phylodb */proj/marchlab/data/phylodb/phylodb_1.076.pep.fa | awk {'printf ("%3s\t%s\n",$3,$4)'}*
 - unique lines *sort -u &lt;file&gt;*
 - line lengths with awk https://riptutorial.com/awk/example/17378/length--string--
-
+- Find where a file is: ex find . -name "*trimmomatic*"
 
 
