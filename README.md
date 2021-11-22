@@ -634,7 +634,7 @@ See this site http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/
 - *?* is individual character wildcard, can be combined '???' = 3 wildcard characters
 - replacing script input with *$&lt;#&gt;* enables user to input upon submission eg: a script.sh containing *rsync $1 $2* -> *sh script.sh file/path/1 file/path/2*
 - longleaf interactive session *srun -p interact --pty &lt;program&gt;* see https://its.unc.edu/research-computing/techdocs/longleaf-slurm-examples/
-- search a file *grep &lt;search term&gt; &lt;file&gt;*
+- search a file *grep &lt;search term&gt; &lt;file&gt;* !WARNING! if searching for &gt; in a file use single quotes (ie grep '&gt;') or you may overwrite files since &gt; redirects standard out to file
 - to get unique taxa in phylodb */proj/marchlab/data/phylodb/phylodb_1.076.pep.fa | awk {'printf ("%3s\t%s\n",$3,$4)'}*
 - unique lines *sort -u &lt;file&gt;*
 - line lengths with awk https://riptutorial.com/awk/example/17378/length--string--
