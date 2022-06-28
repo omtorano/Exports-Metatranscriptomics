@@ -148,7 +148,7 @@ RUN=${SLURM_ARRAY_TASK_ID}
 ```
 input=`ls ${indir}/*R1* | awk -F 'R1' '{print $1}'| sed -n ${RUN}p`
 ```
-7) Echo (print) the run id (here 1-21) and sample name purely for user ease of comprehension, this has no effect on trimming. The -e flag here allows echo to interpret the backslash escapes, here used to print on a new line "\n", other uses include "\t" if you want to echo something but have it be tab separated.
+7) Echo (print) the run id (here 1-21) and sample name purely for user ease of comprehension, this has no effect on trimming. The -e flag allows echo to interpret the backslash escapes, here used to print on a new line "\n", other uses include "\t" if you want to echo something but have it be tab separated.
 ```
 echo -e "\nRun ID: ${RUN}"
 echo -e "\nSample: ${input}"
