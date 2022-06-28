@@ -140,7 +140,7 @@ else
     echo " ... exists"
 fi
 ```
-5) Set variable called 'RUN' to = slurm array task id (https://slurm.schedmd.com/job_array.html). This is a very cool tool for submitting a bunch of jobs at once, more explanation below. Naming is really necessary but makes the following line a bit cleaner.
+5) Set variable called 'RUN' to = slurm array task id (https://slurm.schedmd.com/job_array.html). This is a very cool tool for submitting a bunch of jobs at once, more explanation below. Naming is not necessary but makes the following line a bit cleaner.
 ```
 RUN=${SLURM_ARRAY_TASK_ID}
 ```
