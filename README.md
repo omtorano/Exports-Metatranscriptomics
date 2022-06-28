@@ -128,6 +128,7 @@ indir=/pine/scr/o/m/omtorano/exports/reads
 outdir=/pine/scr/o/m/omtorano/exports/trimmed_reads
 ```
 Transferring files is not necessary, a script run out of scratch can access files in any directory (assuming the user has permission). In the above case I am basically making a copy of my raw reads in my scratch space. This might be desirable if multiple users are accesing files and they are being moved, or you want to make a copy to ensure nothing happens to the original read files. 
+
 4) This creates the out directory if it does not already exist. Echo is a Linux command that prints - so the line "checking if out directory exists" will print in your .out file. This is not necessary for creating the directory, just helpful to tell you what it’s doing. Below this is a conditional if/then statement saying if out directory does not exist then make it, if it does exist then print "... exists". The "!" means does not exist and the -d indicates what follows will be a directory, in this case if outdir does not exist, fi closes the conditional.
 ```
 echo "Checking if ${outdir} exists ..."
