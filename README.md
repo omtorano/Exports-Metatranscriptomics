@@ -1,5 +1,5 @@
-Annotated metatranscriptomics pipeline
-adapted from https://github.com/Lswhiteh/diatom-metatranscriptomics
+~ Annotated metatranscriptomics pipeline
+adapted from previous Marchetti lab pipelines, specifically https://github.com/Lswhiteh/diatom-metatranscriptomics -- Thank you Logan! ~
 # Overview
 This pipeline was used for the 2020 High Yield EXPORTS metatranscriptomics RNA samples, but every effort has been made to make these scripts easy to understand and modify for future projects. 
 
