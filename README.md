@@ -79,7 +79,7 @@ Once RNA extraction is complete, libraries have been prepped and sequenced, and 
 
 ## Getting Started
 Rules for the Marchetti Lab /proj space
-- Do not work in the proj space, it is only for storage of 'final product' files from each stage in pipeline. We have a history of running out of space, storage availability can be tracked here https://rc-storage-info.its.unc.edu:32000.
+- Do not work in the proj space, it is only for storage of 'final product' files from each stage in pipeline. We have a history of running out of space, storage availability can be tracked here https://service.rc.unc.edu/storageapp/login.
 - Instead work in scratch (/pine/scr/&lt;o&gt;/&lt;n&gt;/&lt;onyen&gt;, for example my path is /pine/scr/o/m/omtorano) or home directory (/nas/longleaf/home/&lt;onyen&gt;). Scratch has tons of space but inactive files will be deleted by ITS after ~30 days, they send an email before deletion.
 - Use the rsync command to move files, mv deletes files from their original location and if interrupted will result in data loss.
 - Use the rm (remove) command CAREFULLY, permanently deletes files.
